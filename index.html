@@ -56,7 +56,7 @@
         }
 
         /* =========================================
-           CUSTOM SCROLLBAR (NEW UPDATE)
+           CUSTOM SCROLLBAR
            ========================================= */
         ::-webkit-scrollbar {
             width: 6px;
@@ -109,7 +109,6 @@
             vertical-align: middle;
         }
 
-        /* VIP TICK COLOR CHANGING ANIMATION */
         @keyframes vipTickCycle {
             0% { color: var(--blue-tick); filter: drop-shadow(0 0 4px var(--blue-tick)); }
             33% { color: var(--silver-tick); filter: drop-shadow(0 0 4px var(--silver-tick)); }
@@ -194,7 +193,7 @@
         /* =========================================
            HEADER & NAVIGATION
            ========================================= */
-        header { background: var(--header-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; z-index: 100; }
+        header { background: var(--header-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; z-index: 100; position: relative; }
 
         #dropdown-menu { 
             display: none; position: absolute; right: 15px; top: 60px; background: #233138; 
@@ -240,13 +239,13 @@
         /* =========================================
            CHAT STYLES
            ========================================= */
-        .chat-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: #0b141a; position: relative; transition: background 0.5s ease; scroll-behavior: smooth; /* UPDATE: Smooth scrolling */ }
+        .chat-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: #0b141a; position: relative; transition: background 0.5s ease; scroll-behavior: smooth; }
         .chat-body.golden-theme { background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%) !important; }
 
         .bubble { 
             max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 15.5px; position: relative; 
             word-wrap: break-word; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: slideMsg 0.3s ease;
-            -webkit-user-select: none; /* Prevent text selection during long press */
+            -webkit-user-select: none; 
             user-select: none; 
         }
         @keyframes slideMsg { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -293,14 +292,13 @@
         .action-opt:active { background: #182229; }
 
         /* =========================================
-           FOOTER CONTROLS & NEW AUDIO RECORDER UI
+           FOOTER CONTROLS & AUDIO RECORDER UI
            ========================================= */
         footer { padding: 12px 15px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); background: var(--header-bg); display: flex; align-items: center; gap: 12px; }
         #msg-input { margin: 0; border-radius: 25px; flex: 1; background: #2a3942; padding: 12px 20px; color: white; border: none; outline: none; }
         .action-icon { font-size: 22px; color: #8696a0; cursor: pointer; transition: 0.2s; }
         .action-icon:hover { color: white; }
 
-        /* NEW BLINKING DOT CSS */
         .blinking-dot {
             width: 12px; height: 12px;
             background-color: var(--danger);
@@ -313,7 +311,6 @@
             100% { opacity: 1; }
         }
         
-        /* Audio Player Styling Adjustment */
         audio::-webkit-media-controls-panel {
             background-color: rgba(255, 255, 255, 0.9);
         }
@@ -359,15 +356,13 @@
         </div>
     </div>
 
-
     <div id="media-preview-screen">
         <div class="preview-header">
             <i class="fas fa-times" id="close-preview-btn" style="color:white; font-size:24px; cursor:pointer;"></i>
             <b style="color:white; font-size:16px;" id="preview-title">Send Media</b>
             <div class="vo-btn" id="vo-toggle-btn" title="View Once">1</div>
         </div>
-        <div class="preview-content" id="preview-content-box">
-            </div>
+        <div class="preview-content" id="preview-content-box"></div>
         <div style="padding:15px; background:var(--header-bg); display:flex; gap:10px; padding-bottom: calc(15px + env(safe-area-inset-bottom));">
             <input type="text" id="media-caption-input" placeholder="Add a caption... (optional)" style="flex:1; background:#2a3942; border:none; border-radius:25px; padding:12px 20px; color:white; outline:none; margin:0;">
             <button id="send-media-btn" style="background:var(--wa-action); border:none; border-radius:50%; width:45px; height:45px; color:white; cursor:pointer; display:flex; justify-content:center; align-items:center; flex-shrink:0;">
@@ -390,10 +385,8 @@
         <div style="padding:15px; text-align:center; color:#8696a0; font-weight:bold; cursor:pointer; margin-top:10px;" onclick="document.getElementById('msg-action-sheet').style.display='none'">Cancel</div>
     </div>
 
-
     <div id="auth-screen" style="display: flex;">
         <div class="card" id="login-form">
-            
             <model-viewer src="https://cdn.jsdelivr.net/gh/ishowspeed76042-cmd/GLB/logo.glb" 
                           alt="ACANZA 3D Logo" 
                           auto-rotate 
@@ -426,7 +419,6 @@
         </div>
         
         <div class="card" id="signup-form" style="display:none;">
-            
             <model-viewer src="https://cdn.jsdelivr.net/gh/ishowspeed76042-cmd/GLB/logo.glb" 
                           alt="ACANZA 3D Logo" 
                           auto-rotate 
@@ -481,11 +473,11 @@
     <div id="username-screen">
         <div class="card">
             <h2>Set Your Identity</h2>
-            <div class="avatar" style="width: 100px; height: 100px; margin: 25px auto; border: 3px dashed var(--wa-action); cursor:pointer;" onclick="document.getElementById('pfp-input-setup').click()">
-                <img id="pfp-preview" src="" style="display: none;">
+            <div class="avatar" style="width: 100px; height: 100px; margin: 25px auto; border: 3px dashed var(--wa-action); cursor:pointer;" onclick="document.getElementById('pfp-input').click()">
+                <img id="pfp-preview" src="" style="display: none; width:100%; height:100%; border-radius:50%; object-fit:cover;">
                 <i class="fas fa-camera" id="pfp-icon" style="font-size: 30px;"></i>
             </div>
-            <input type="file" id="pfp-input-setup" style="display: none;" accept="image/*">
+            <input type="file" id="pfp-input" style="display: none;" accept="image/*">
             <input type="text" id="setup-username" placeholder="Enter Username (Unique)...">
             <button class="btn-wa" id="save-user-btn">NEXT STEP <i class="fas fa-arrow-right"></i></button>
         </div>
@@ -648,7 +640,7 @@
     <div id="requests-screen">
         <header>
             <div style="display:flex; align-items:center; gap:15px;">
-                <i class="fas fa-chevron-left" onclick="window.location.href='index.html'" style="cursor:pointer; padding: 5px;"></i>
+                <i class="fas fa-chevron-left" onclick="showMain()" style="cursor:pointer; padding: 5px;"></i>
                 <b style="color:var(--wa-action); font-size: 19px;">Friend Requests</b>
             </div>
         </header>
@@ -699,7 +691,7 @@
                     <div class="blinking-dot"></div>
                     <span id="record-timer" style="color:white; font-weight:bold; font-size: 15px;">00:00</span>
                 </div>
-                <div style="color:#8696a0; font-size:13px; font-style:italic;">Slide to cancel <i class="fas fa-chevron-left"></i></div>
+                <div style="color:#8696a0; font-size:13px; font-style:italic;">Recording Audio...</div>
             </div>
 
             <button id="send-btn" style="background:var(--wa-action); border:none; border-radius:50%; width:45px; height:45px; display:flex; align-items:center; justify-content:center; margin-left:10px; flex-shrink:0; cursor:pointer; outline:none; -webkit-user-select:none; user-select:none;">
@@ -710,25 +702,19 @@
 
     <script type="module">
         // =========================================
-        // DOM CONTENT LOADED - PREVENT UI BLOCKING
+        // DOM CONTENT LOADED
         // =========================================
         document.addEventListener('DOMContentLoaded', () => {
 
-            // =========================================
-            // SERVICE WORKER REGISTRATION
-            // =========================================
             let swReg = null; 
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' })
                 .then((registration) => {
                     swReg = registration; 
-                    console.log('Service Worker registered with scope:', registration.scope);
-                }).catch((err) => {
-                    console.log('Service Worker registration failed:', err);
-                });
+                }).catch((err) => {});
             }
 
-            // DYNAMIC IMPORTS TO DEFER FIREBASE LOAD
+            // DYNAMIC IMPORTS
             import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js").then((appModule) => {
                 const initializeApp = appModule.initializeApp;
                 
@@ -742,9 +728,7 @@
                     const { getDatabase, ref, set, get, push, onValue, serverTimestamp, update, remove, off, onChildAdded, onChildChanged, onChildRemoved } = dbModule;
                     const { getMessaging, getToken, onMessage, isSupported } = messagingModule;
 
-                    // =========================================
                     // FIREBASE CONFIGURATION
-                    // =========================================
                     const firebaseConfig = {
                         apiKey: "AIzaSyAYX1lrxHre2bYKzZfOMM3WWwIKHPySI9I",
                         authDomain: "chat-81c0c.firebaseapp.com",
@@ -765,13 +749,9 @@
                     isSupported().then((supported) => {
                         if (supported) {
                             messaging = getMessaging(app);
-                            onMessage(messaging, (payload) => {
-                                console.log('Foreground Push Received:', payload);
-                            });
+                            onMessage(messaging, (payload) => {});
                         }
-                    }).catch(err => {
-                        console.log("FCM Check Error:", err);
-                    });
+                    }).catch(err => {});
 
                     // SYSTEM CONSTANTS
                     const ADMIN_EMAIL = "Ishowspeed76042@Gmail.com";
@@ -781,8 +761,8 @@
                     const SECRET_KEY = "SPROJECTS-INDIA-SECURE";
                     
                     // API CONSTANTS
-                    const IMGBB_KEY = "5d7c00f51bb00a66f6c70b9f05f04645"; // For Images
-                    const CLOUDINARY_CLOUD_NAME = "dpux3cgfk"; // For Videos & Files
+                    const IMGBB_KEY = "5d7c00f51bb00a66f6c70b9f05f04645"; 
+                    const CLOUDINARY_CLOUD_NAME = "dpux3cgfk"; 
                     const CLOUDINARY_API_KEY = "472692866197662";
                     const CLOUDINARY_API_SECRET = "TK1PV7XpBckh9ykXj3Kreu_vo1E";
 
@@ -797,7 +777,6 @@
                     let authActionTracker = ''; 
                     let verifyPoller = null; 
                     
-                    // NEW: FIREBASE V9 UNSUBSCRIBE VARIABLES TO PREVENT LISTENER DUPLICATION
                     let unsubChatAdded = null;
                     let unsubChatChanged = null;
                     let unsubChatRemoved = null;
@@ -806,26 +785,20 @@
                     let unsubAdmin = null;
                     let unsubIncomingCall = null;
                     
-                    // VARS FOR PREVIEW & VIEW ONCE
                     let pendingMediaFile = null;
                     let isViewOnceActive = false;
                     
-                    // VARS FOR VOICE NOTES
                     let mediaRecorder = null;
                     let audioChunks = [];
                     let recordTimerInterval = null;
                     let recordSeconds = 0;
                     let isRecording = false;
-                    let isCancelled = false;
-                    let startX = 0;
 
-                    // GLOBAL ACTION HANDLERS
                     window.activeMsgKey = null;
                     window.activeMsgContent = null;
                     window.activeMsgType = null;
                     window.activeViewOnceKey = null;
 
-                    // NEW: WEBRTC VARIABLES FOR CALLING
                     let localStream = null;
                     let remoteStream = null;
                     let peerConnection = null;
@@ -835,12 +808,9 @@
                     async function syncFCMToken(userKey) {
                         try {
                             const messagingSupported = await isSupported();
-                            if (!messagingSupported) {
-                                throw new Error("Aapka browser Push Notifications support nahi karta hai. Kripya Chrome ka latest version use karein.");
-                            }
+                            if (!messagingSupported) return;
 
                             const messaging = getMessaging(app);
-                            
                             let registration = swReg;
                             if (!registration && 'serviceWorker' in navigator) {
                                 registration = await navigator.serviceWorker.ready;
@@ -853,20 +823,48 @@
 
                             if (token) {
                                 await update(ref(db, `users/${userKey}`), { fcmToken: token });
-                                console.log("S-PROJECTS: FCM Token Synced Successfully!");
                             }
-                        } catch (err) {
-                            console.error("FCM Error Details:", err);
-                        }
+                        } catch (err) {}
                     }
 
                     // =========================================
-                    // WEBRTC SIGNALING LOGIC (GLOBAL LISTENER)
+                    // FORM TOGGLE & NAVIGATION SWITCHERS
                     // =========================================
+                    document.getElementById('to-signup').onclick = () => {
+                        document.getElementById('login-form').style.display = 'none';
+                        document.getElementById('signup-form').style.display = 'block';
+                    };
+
+                    document.getElementById('to-login').onclick = () => {
+                        document.getElementById('signup-form').style.display = 'none';
+                        document.getElementById('login-form').style.display = 'block';
+                    };
+
+                    function switchScreen(id) {
+                        const screens = [
+                            'auth-screen', 
+                            'verification-screen', 
+                            'username-screen', 
+                            'referral-screen', 
+                            'main-app', 
+                            'chat-screen', 
+                            'admin-panel', 
+                            'requests-screen',
+                            'app-details-screen'
+                        ];
+                        
+                        screens.forEach(s => {
+                            const el = document.getElementById(s);
+                            if(el) {
+                                el.style.display = (s === id ? 'flex' : 'none');
+                            }
+                        });
+                    }
+                    window.switchScreen = switchScreen;
+
+                    // WEBRTC CALL LISTENER
                     function listenForIncomingCalls() {
                         const incomingRef = ref(db, `calls_incoming/${currentUser}`);
-                        
-                        // UNSUBSCRIBE PREVIOUS TO PREVENT DUPLICATION
                         if (unsubIncomingCall) unsubIncomingCall();
 
                         unsubIncomingCall = onValue(incomingRef, async (snap) => {
@@ -883,7 +881,6 @@
                                 } catch(e){}
 
                                 document.getElementById('incoming-call-screen').style.display = 'flex';
-                                
                                 document.getElementById('accept-call-btn').onclick = () => answerCall(callData);
                                 document.getElementById('reject-call-btn').onclick = async () => {
                                     await remove(incomingRef);
@@ -902,12 +899,10 @@
                             localStream = await navigator.mediaDevices.getUserMedia(constraints);
                             document.getElementById('local-video').srcObject = localStream;
                             document.getElementById('local-video').style.display = type === 'video' ? 'block' : 'none';
-                            
-                            // Check mute buttons
                             document.getElementById('toggle-mic-btn').style.color = 'white';
                             document.getElementById('toggle-vid-btn').style.color = 'white';
                         } catch(e) {
-                            alert("Bhai, Camera aur Microphone ki permission de app ko settings mein jaakar!");
+                            alert("Camera aur Microphone ki permission allow kijiye!");
                             throw e;
                         }
                     }
@@ -974,7 +969,6 @@
                                     peerConnection.setRemoteDescription(answerDesc);
                                 }
                                 if(!data && document.getElementById('active-call-screen').style.display === 'flex') {
-                                    // Room deleted = call rejected or ended
                                     cleanupCall();
                                 }
                             });
@@ -1025,7 +1019,6 @@
                             });
 
                             await remove(ref(db, `calls_incoming/${currentUser}`));
-
                             document.getElementById('active-call-status').innerText = 'Connected';
 
                             onChildAdded(callerCandidatesRef, snap => {
@@ -1074,9 +1067,7 @@
                         }
                     };
 
-                    // =========================================
-                    // GOOGLE LOGIN LOGIC
-                    // =========================================
+                    // GOOGLE AUTH LOGIC
                     document.getElementById('google-login-btn').onclick = () => {
                         authActionTracker = 'login';
                         signInWithPopup(auth, googleProvider).catch(error => {
@@ -1089,7 +1080,6 @@
                         if(accCount >= 2) {
                             return alert("Security Block: Max 2 accounts per device.");
                         }
-                        
                         authActionTracker = 'signup';
                         signInWithPopup(auth, googleProvider)
                             .then(() => {
@@ -1100,9 +1090,7 @@
                             });
                     };
 
-                    // =========================================
-                    // EMAIL & PASSWORD AUTHENTICATION
-                    // =========================================
+                    // EMAIL AUTH
                     document.getElementById('email-login-btn').onclick = () => {
                         authActionTracker = 'login';
                         const btn = document.getElementById('email-login-btn');
@@ -1140,42 +1128,24 @@
 
                     document.getElementById('forget-pass-btn').onclick = () => {
                         const email = document.getElementById('login-email').value.trim();
-                        if(!email) {
-                            return alert("Bhai, pehle email toh dalo!");
-                        }
-                        
+                        if(!email) return alert("Pehle email enter kijiye!");
                         sendPasswordResetEmail(auth, email)
-                            .then(() => {
-                                alert("Password reset link sent!");
-                            })
-                            .catch((error) => {
-                                alert("Error: " + error.message);
-                            });
+                            .then(() => alert("Password reset link sent!"))
+                            .catch((error) => alert("Error: " + error.message));
                     };
 
-                    // =========================================
-                    // VERIFICATION CANCEL
-                    // =========================================
                     document.getElementById('cancel-verify-btn').onclick = () => {
-                        if (verifyPoller) {
-                            clearInterval(verifyPoller);
-                        }
+                        if (verifyPoller) clearInterval(verifyPoller);
                         signOut(auth);
                     };
 
-                    // =========================================
-                    // AUTHENTICATION STATE LISTENER
-                    // =========================================
+                    // AUTH STATE LISTENER
                     onAuthStateChanged(auth, async (user) => {
                         if (user) {
                             const isEmailAuth = user.providerData.some(p => p.providerId === 'password');
-                            
                             if (isEmailAuth && !user.emailVerified) {
                                 switchScreen('verification-screen');
-                                
-                                if (verifyPoller) {
-                                    clearInterval(verifyPoller);
-                                }
+                                if (verifyPoller) clearInterval(verifyPoller);
                                 
                                 verifyPoller = setInterval(async () => {
                                     await auth.currentUser.reload();
@@ -1184,19 +1154,14 @@
                                         processValidatedUser(auth.currentUser);
                                     }
                                 }, 3000); 
-                                
                                 return; 
                             }
-                            
                             processValidatedUser(user);
                         } else {
                             switchScreen('auth-screen');
                         }
                     });
 
-                    // =========================================
-                    // DATA PROCESSING & ROUTING
-                    // =========================================
                     async function processValidatedUser(user) {
                         const adminPanelBtn = document.getElementById('admin-req-trigger');
                         const devChatBtn = document.getElementById('talk-dev-btn');
@@ -1213,75 +1178,142 @@
                         }
 
                         const snap = await get(ref(db, 'userMapping/' + currentUID));
-                        
                         if (snap.exists()) {
                             currentUser = snap.val(); 
-                            
-                            // 🔥 CRITICAL FIX: Load UI instantly, NEVER wait for FCM to block the screen 🔥
                             showMain();
-
-                            // 🔥 BACKGROUND FCM LOGIC 🔥
                             syncFCMToken(currentUser);
-
-                            // 🔥 LISTEN FOR INCOMING WEBRTC CALLS GLOBALLY 🔥
                             listenForIncomingCalls();
-
                         } else {
-                            if(user.photoURL) {
-                                tempPfpUrl = user.photoURL;
-                            }
+                            if(user.photoURL) tempPfpUrl = user.photoURL;
                             if(tempPfpUrl) {
                                 document.getElementById('pfp-preview').src = tempPfpUrl;
                                 document.getElementById('pfp-preview').style.display = 'block';
                                 document.getElementById('pfp-icon').style.display = 'none';
                             }
-                            
                             switchScreen('username-screen');
                         }
-                        
                         authActionTracker = ''; 
                     }
 
-                    // =========================================
-                    // UTILITY FUNCTIONS
-                    // =========================================
+                    // PROFILE PIC PREVIEW & SAVE USERNAME
+                    document.getElementById('pfp-input').onchange = (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                                document.getElementById('pfp-preview').src = event.target.result;
+                                document.getElementById('pfp-preview').style.display = 'block';
+                                document.getElementById('pfp-icon').style.display = 'none';
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    };
+
+                    document.getElementById('save-user-btn').onclick = async () => {
+                        const usernameInput = document.getElementById('setup-username').value.trim().toLowerCase();
+                        if (!usernameInput) {
+                            return alert("Username enter karna zaroori hai!");
+                        }
+                        if (!/^[a-z0-9_]{3,20}$/.test(usernameInput)) {
+                            return alert("Username me sirf letters, numbers aur underscore hi allowed hain (3-20 chars).");
+                        }
+
+                        const saveBtn = document.getElementById('save-user-btn');
+                        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SAVING...';
+
+                        try {
+                            const existingSnap = await get(ref(db, `users/${usernameInput}`));
+                            if (existingSnap.exists()) {
+                                saveBtn.innerHTML = 'NEXT STEP <i class="fas fa-arrow-right"></i>';
+                                return alert("Yeh username already taken hai, koi dusra chuniye!");
+                            }
+
+                            let pfpUrl = tempPfpUrl || "";
+                            const fileInput = document.getElementById('pfp-input');
+                            if (fileInput.files && fileInput.files[0]) {
+                                const fd = new FormData();
+                                fd.append("image", fileInput.files[0]);
+                                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+                                    method: "POST",
+                                    body: fd
+                                });
+                                const data = await res.json();
+                                if (data.success) {
+                                    pfpUrl = data.data.url;
+                                }
+                            }
+
+                            await set(ref(db, `users/${usernameInput}`), {
+                                uid: currentUID,
+                                email: auth.currentUser.email || "",
+                                profilePic: pfpUrl,
+                                createdAt: serverTimestamp()
+                            });
+
+                            await set(ref(db, `userMapping/${currentUID}`), usernameInput);
+
+                            currentUser = usernameInput;
+                            saveBtn.innerHTML = 'NEXT STEP <i class="fas fa-arrow-right"></i>';
+                            switchScreen('referral-screen');
+
+                        } catch (err) {
+                            alert("Error saving username: " + err.message);
+                            saveBtn.innerHTML = 'NEXT STEP <i class="fas fa-arrow-right"></i>';
+                        }
+                    };
+
+                    // REFERRAL HANDLERS
+                    document.getElementById('apply-ref-btn').onclick = async () => {
+                        const refCode = document.getElementById('ref-code-input').value.trim().toLowerCase();
+                        if (!refCode) return alert("Please enter a referral code!");
+
+                        const refBtn = document.getElementById('apply-ref-btn');
+                        refBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> APPLYING...';
+
+                        try {
+                            const refUserSnap = await get(ref(db, `users/${refCode}`));
+                            if (!refUserSnap.exists()) {
+                                refBtn.innerHTML = 'APPLY & START CHATTING';
+                                return alert("Invalid referral code! User does not exist.");
+                            }
+
+                            const referrerUID = refUserSnap.val().uid;
+                            const rewardTime = 7 * 24 * 60 * 60 * 1000;
+
+                            const currentMetaSnap = await get(ref(db, `users_meta/${referrerUID}/membership`));
+                            let newExpiry = Date.now() + rewardTime;
+
+                            if (currentMetaSnap.exists() && currentMetaSnap.val().active) {
+                                const oldExpiry = currentMetaSnap.val().expiry || Date.now();
+                                newExpiry = Math.max(oldExpiry, Date.now()) + rewardTime;
+                            }
+
+                            await update(ref(db, `users_meta/${referrerUID}/membership`), {
+                                active: true,
+                                expiry: newExpiry
+                            });
+
+                            alert("Referral Applied! 7 Days Elite VIP added to @" + refCode);
+                            showMain();
+                        } catch(e) {
+                            alert("Error applying referral code.");
+                            refBtn.innerHTML = 'APPLY & START CHATTING';
+                        }
+                    };
+
+                    document.getElementById('skip-ref-btn').onclick = () => {
+                        showMain();
+                    };
+
                     async function notifyTelegram(msg) {
                         const text = `🚀 *NEW SUPPORT MESSAGE*\n\n👤 *User:* @${currentUser}\n💬 *Message:* ${msg}`;
                         const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
-                        
-                        fetch(url).catch(e => {
-                            console.error("TG Error");
-                        });
+                        fetch(url).catch(e => {});
                     }
 
-                    function switchScreen(id) {
-                        const screens = [
-                            'auth-screen', 
-                            'verification-screen', 
-                            'username-screen', 
-                            'referral-screen', 
-                            'main-app', 
-                            'chat-screen', 
-                            'admin-panel', 
-                            'requests-screen',
-                            'app-details-screen'
-                        ];
-                        
-                        screens.forEach(s => {
-                            const el = document.getElementById(s);
-                            if(el) {
-                                el.style.display = (s === id ? 'flex' : 'none');
-                            }
-                        });
-                    }
-
-                    // =========================================
                     // FRIEND REQUESTS LOGIC
-                    // =========================================
                     function listenToRequests() {
                         const reqRef = ref(db, `friend_requests/${currentUser}`);
-                        
-                        // UNSUBSCRIBE PREVIOUS LISTENER TO PREVENT DUPLICATION
                         if (unsubReq) unsubReq();
 
                         unsubReq = onValue(reqRef, async (snap) => {
@@ -1289,7 +1321,6 @@
                             const badge = document.getElementById('req-badge');
                             
                             list.innerHTML = "";
-                            
                             if(!snap.exists() || Object.keys(snap.val()).length === 0) {
                                 list.innerHTML = `<p style="text-align:center; padding:50px; color:#8696a0;">No Pending Requests</p>`;
                                 badge.style.display = 'none';
@@ -1297,14 +1328,10 @@
                             }
                             
                             let reqCount = 0;
-                            
                             for(let sender in snap.val()) {
                                 reqCount++;
                                 const uSnap = await get(ref(db, `users/${sender}`));
-                                
-                                if(!uSnap.val()) {
-                                    continue;
-                                }
+                                if(!uSnap.val()) continue;
                                 
                                 const fUID = uSnap.val().uid;
                                 const mSnap = await get(ref(db, `users_meta/${fUID}/membership`));
@@ -1341,37 +1368,30 @@
                                 acceptBtn.onclick = async (e) => {
                                     e.stopPropagation();
                                     const senderUser = e.currentTarget.getAttribute('data-user');
-                                    
                                     await set(ref(db, `friends/${currentUser}/${senderUser}`), true);
                                     await set(ref(db, `friends/${senderUser}/${currentUser}`), true);
                                     await remove(ref(db, `friend_requests/${currentUser}/${senderUser}`));
-                                    
                                     alert(`You are now friends with @${senderUser}!`);
                                 };
 
                                 declineBtn.onclick = async (e) => {
                                     e.stopPropagation();
                                     const senderUser = e.currentTarget.getAttribute('data-user');
-                                    
                                     try {
                                         await remove(ref(db, `friend_requests/${currentUser}/${senderUser}`));
-                                        alert(`Friend request from @${senderUser} has been canceled.`);
+                                        alert(`Friend request from @${senderUser} canceled.`);
                                     } catch (err) { 
                                         alert("Failed to deny request."); 
                                     }
                                 };
                             }
-                            
                             badge.innerText = reqCount;
                             badge.style.display = 'inline-block';
                         });
                     }
 
-                    // =========================================
-                    // SHOW MAIN APPLICATION & FRIENDS LIST
-                    // =========================================
+                    // SHOW MAIN APP
                     async function showMain() {
-                        // CLEANUP ACTIVE CHAT LISTENERS BEFORE SWITCHING TABS
                         if(unsubChatAdded) { unsubChatAdded(); unsubChatAdded = null; }
                         if(unsubChatChanged) { unsubChatChanged(); unsubChatChanged = null; }
                         if(unsubChatRemoved) { unsubChatRemoved(); unsubChatRemoved = null; }
@@ -1381,7 +1401,6 @@
                         
                         const myPfp = await get(ref(db, `users/${currentUser}/profilePic`));
                         const myPfpContainer = document.getElementById('my-pfp-container');
-                        
                         myPfpContainer.innerHTML = myPfp.val() ? `<img src="${myPfp.val()}">` : `<i class="fas fa-user"></i>`;
                         
                         const myMeta = await get(ref(db, `users_meta/${currentUID}/membership`));
@@ -1389,7 +1408,6 @@
 
                         if(myMeta.exists()) {
                             const metaData = myMeta.val();
-                            
                             if(metaData.active) {
                                 if (metaData.expiry && Date.now() > metaData.expiry) {
                                     await update(ref(db, `users_meta/${currentUID}/membership`), { active: false });
@@ -1401,54 +1419,34 @@
                         }
                         
                         document.getElementById('my-blue-tick').style.display = amIVerified ? "inline-block" : "none";
-                        
-                        if(amIVerified) {
-                            myPfpContainer.classList.add('vip-ring');
-                        } else {
-                            myPfpContainer.classList.remove('vip-ring');
-                        }
+                        if(amIVerified) myPfpContainer.classList.add('vip-ring');
+                        else myPfpContainer.classList.remove('vip-ring');
 
                         listenToRequests();
 
                         const list = document.getElementById('friend-list');
-                        
                         const friendsRef = ref(db, `friends/${currentUser}`);
 
-                        // UNSUBSCRIBE PREVIOUS TO PREVENT DUPLICATION
                         if (unsubFriends) unsubFriends();
 
                         unsubFriends = onValue(friendsRef, async (snap) => {
                             list.innerHTML = "";
-                            
-                            // KILL ALL PREVIOUS BADGE LISTENERS 
-                            Object.values(activeChatListeners).forEach(unsub => {
-                                if (typeof unsub === 'function') unsub();
-                            });
+                            Object.values(activeChatListeners).forEach(unsub => { if (typeof unsub === 'function') unsub(); });
                             activeChatListeners = {};
 
-                            if (!snap.exists()) {
-                                return;
-                            }
+                            if (!snap.exists()) return;
                             
                             for(let fKey in snap.val()) {
                                 const uSnap = await get(ref(db, `users/${fKey}`));
-                                
-                                if(!uSnap.val()) {
-                                    continue;
-                                }
+                                if(!uSnap.val()) continue;
                                 
                                 const fUID = uSnap.val().uid;
                                 const mSnap = await get(ref(db, `users_meta/${fUID}/membership`));
                                 let isVerified = false;
 
-                                if(mSnap.exists()) {
-                                    const mData = mSnap.val();
-                                    if (mData.active) {
-                                        if (mData.expiry && Date.now() > mData.expiry) {
-                                            // Expired
-                                        } else {
-                                            isVerified = true;
-                                        }
+                                if(mSnap.exists() && mSnap.val().active) {
+                                    if (!(mSnap.val().expiry && Date.now() > mSnap.val().expiry)) {
+                                        isVerified = true;
                                     }
                                 }
 
@@ -1474,12 +1472,8 @@
                                 `;
                                 
                                 item.onclick = (e) => { 
-                                    if (e.target.classList.contains('select-cb')) {
-                                        return;
-                                    }
-                                    if(!isSelectionMode) {
-                                        openChat(fKey, isVerified); 
-                                    }
+                                    if (e.target.classList.contains('select-cb')) return;
+                                    if(!isSelectionMode) openChat(fKey, isVerified); 
                                 };
                                 
                                 list.appendChild(item);
@@ -1487,7 +1481,6 @@
                                 const cid = [currentUser, fKey].sort().join("_");
                                 const chatRef = ref(db, `chats/${cid}`);
                                 
-                                // CAPTURE THE UNSUBSCRIBE FUNCTION FOR BADGES
                                 const unsubBadge = onValue(chatRef, (chatSnap) => {
                                     let unreadCount = 0;
                                     let lastMsgText = "Tap to open secure chat";
@@ -1495,30 +1488,18 @@
                                     if (chatSnap.exists()) {
                                         chatSnap.forEach(msgSnap => {
                                             const msg = msgSnap.val();
+                                            if (msg.sender !== currentUser && msg.status !== 'read') unreadCount++; 
                                             
-                                            if (msg.sender !== currentUser && msg.status !== 'read') { 
-                                                unreadCount++; 
-                                            }
-                                            
-                                            if(msg.isViewOnce) {
-                                                lastMsgText = "💣 View Once Media";
-                                            } else if (msg.type === 'text') {
+                                            if(msg.isViewOnce) lastMsgText = "💣 View Once Media";
+                                            else if (msg.type === 'text') {
                                                 try {
                                                     let bytes = CryptoJS.AES.decrypt(msg.text, SECRET_KEY);
                                                     lastMsgText = bytes.toString(CryptoJS.enc.Utf8);
-                                                } catch(e) { 
-                                                    lastMsgText = "Encrypted Message"; 
-                                                }
-                                            } else if (msg.type === 'audio') {
-                                                lastMsgText = "🎤 Voice Note";
-                                            } else if (msg.type === 'image') {
-                                                lastMsgText = "📷 Image";
-                                                if (msg.caption) lastMsgText = "📷 Photo with caption";
-                                            } else if (msg.type === 'video') {
-                                                lastMsgText = "🎥 Video";
-                                            } else if (msg.type === 'file') {
-                                                lastMsgText = "📄 File";
-                                            }
+                                                } catch(e) { lastMsgText = "Encrypted Message"; }
+                                            } else if (msg.type === 'audio') lastMsgText = "🎤 Voice Note";
+                                            else if (msg.type === 'image') lastMsgText = msg.caption ? "📷 Photo with caption" : "📷 Image";
+                                            else if (msg.type === 'video') lastMsgText = "🎥 Video";
+                                            else if (msg.type === 'file') lastMsgText = "📄 File";
                                         });
                                     }
 
@@ -1533,40 +1514,111 @@
                                     }
 
                                     const lastMsgObj = document.getElementById(`last-msg-${fKey}`);
-                                    if (lastMsgObj) { 
-                                        lastMsgObj.innerText = lastMsgText; 
-                                    }
+                                    if (lastMsgObj) lastMsgObj.innerText = lastMsgText; 
                                 });
                                 
                                 activeChatListeners[cid] = unsubBadge;
                             }
                         });
                     }
+                    window.showMain = showMain;
 
-                    // =========================================
-                    // ADMIN PANEL NOTIFICATIONS
-                    // =========================================
-                    document.getElementById('admin-req-trigger').onclick = () => {
-                        if(auth.currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-                            return;
+                    // DROPDOWN MENU EVENTS
+                    document.getElementById('menu-btn-trigger').onclick = (e) => {
+                        e.stopPropagation();
+                        const menu = document.getElementById('dropdown-menu');
+                        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                    };
+
+                    document.addEventListener('click', (e) => {
+                        const menu = document.getElementById('dropdown-menu');
+                        if (menu && menu.style.display === 'block' && !e.target.closest('#dropdown-menu') && !e.target.closest('#menu-btn-trigger')) {
+                            menu.style.display = 'none';
                         }
-                        
-                        switchScreen('admin-panel');
-                        
-                        const adminInboxRef = ref(db, `admin_inbox`);
-                        
-                        // UNSUBSCRIBE PREVIOUS TO PREVENT DUPLICATION
-                        if (unsubAdmin) unsubAdmin();
+                    });
 
+                    document.getElementById('app-details-btn').onclick = () => {
+                        document.getElementById('dropdown-menu').style.display = 'none';
+                        switchScreen('app-details-screen');
+                    };
+
+                    document.getElementById('req-menu-btn').onclick = () => {
+                        document.getElementById('dropdown-menu').style.display = 'none';
+                        switchScreen('requests-screen');
+                    };
+
+                    document.getElementById('talk-dev-btn').onclick = () => {
+                        document.getElementById('dropdown-menu').style.display = 'none';
+                        openChat(ADMIN_USER, true);
+                    };
+
+                    document.getElementById('opt-select').onclick = () => {
+                        document.getElementById('dropdown-menu').style.display = 'none';
+                        isSelectionMode = !isSelectionMode;
+                        document.getElementById('selection-bar').style.display = isSelectionMode ? 'flex' : 'none';
+                        document.querySelectorAll('.select-cb').forEach(cb => cb.style.display = isSelectionMode ? 'block' : 'none');
+                    };
+
+                    document.getElementById('cancel-selection').onclick = () => {
+                        isSelectionMode = false;
+                        document.getElementById('selection-bar').style.display = 'none';
+                        document.querySelectorAll('.select-cb').forEach(cb => { cb.style.display = 'none'; cb.checked = false; });
+                    };
+
+                    document.getElementById('execute-block').onclick = async () => {
+                        const selectedCBs = document.querySelectorAll('.select-cb:checked');
+                        if (selectedCBs.length === 0) return alert("No users selected!");
+                        
+                        if (confirm(`Remove ${selectedCBs.length} selected friend(s)?`)) {
+                            for (let cb of selectedCBs) {
+                                const targetUser = cb.getAttribute('data-user');
+                                await remove(ref(db, `friends/${currentUser}/${targetUser}`));
+                                await remove(ref(db, `friends/${targetUser}/${currentUser}`));
+                            }
+                            alert("Selected friends removed!");
+                            document.getElementById('cancel-selection').click();
+                        }
+                    };
+
+                    document.getElementById('logout-btn').onclick = () => {
+                        document.getElementById('dropdown-menu').style.display = 'none';
+                        signOut(auth);
+                    };
+
+                    // ADD FRIEND BUTTON
+                    document.getElementById('add-friend-btn').onclick = async () => {
+                        const targetUser = prompt("Enter Username to send Friend Request:")?.trim().toLowerCase();
+                        if (!targetUser) return;
+                        if (targetUser === currentUser) return alert("You cannot send friend request to yourself!");
+                        
+                        try {
+                            const uSnap = await get(ref(db, `users/${targetUser}`));
+                            if (!uSnap.exists()) return alert("User @" + targetUser + " does not exist!");
+                            
+                            const isAlreadyFriend = await get(ref(db, `friends/${currentUser}/${targetUser}`));
+                            if (isAlreadyFriend.exists()) return alert("You are already friends with @" + targetUser);
+                            
+                            await set(ref(db, `friend_requests/${targetUser}/${currentUser}`), true);
+                            alert("Friend Request sent to @" + targetUser + "!");
+                        } catch(err) {
+                            alert("Failed to send request.");
+                        }
+                    };
+
+                    // ADMIN PANEL
+                    document.getElementById('admin-req-trigger').onclick = () => {
+                        if(auth.currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+                        switchScreen('admin-panel');
+                        const adminInboxRef = ref(db, `admin_inbox`);
+
+                        if (unsubAdmin) unsubAdmin();
                         unsubAdmin = onValue(adminInboxRef, async (snap) => {
                             const list = document.getElementById('admin-req-list');
                             list.innerHTML = "";
-                            
                             if(!snap.exists()) {
                                 list.innerHTML = `<p style="text-align:center; padding:50px; color:#8696a0;">No Active Support Requests</p>`;
                                 return;
                             }
-                            
                             for(let sender in snap.val()) {
                                 const data = snap.val()[sender];
                                 const pfpSnap = await get(ref(db, `users/${sender}/profilePic`));
@@ -1583,28 +1635,19 @@
                                     </div>
                                     <i class="fas fa-chevron-right" style="color:#444;"></i>
                                 `;
-                                
                                 item.onclick = () => openChat(sender);
                                 list.appendChild(item);
                             }
                         });
                     };
 
-                    // =========================================
-                    // GLOBAL ACTION TRIGGERS FOR CHAT BUBBLES
-                    // =========================================
+                    // ACTION SHEET FOR EDIT & UNSEND
                     window.openMsgActions = (key, content, type) => {
                         window.activeMsgKey = key;
                         window.activeMsgContent = content;
                         window.activeMsgType = type;
                         
-                        const editOpt = document.getElementById('opt-edit-msg');
-                        if (type === 'text') {
-                            editOpt.style.display = 'flex';
-                        } else {
-                            editOpt.style.display = 'none'; // Only allow edit for pure text
-                        }
-                        
+                        document.getElementById('opt-edit-msg').style.display = (type === 'text') ? 'flex' : 'none';
                         document.getElementById('msg-action-sheet').style.display = 'flex';
                     };
                     
@@ -1614,18 +1657,13 @@
                         const vContent = document.getElementById('vo-viewer-content');
                         const vCaption = document.getElementById('vo-viewer-caption');
                         
-                        if(type === 'image') {
-                            vContent.innerHTML = `<img src="${url}" style="max-width:100%; max-height:100%; border-radius:10px; object-fit:contain;">`;
-                        } else if(type === 'video') {
-                            vContent.innerHTML = `<video src="${url}" controls autoplay style="max-width:100%; max-height:100%; border-radius:10px;"></video>`;
-                        }
+                        if(type === 'image') vContent.innerHTML = `<img src="${url}" style="max-width:100%; max-height:100%; border-radius:10px; object-fit:contain;">`;
+                        else if(type === 'video') vContent.innerHTML = `<video src="${url}" controls autoplay style="max-width:100%; max-height:100%; border-radius:10px;"></video>`;
                         
                         if(caption) {
                             vCaption.innerText = caption;
                             vCaption.style.display = 'block';
-                        } else {
-                            vCaption.style.display = 'none';
-                        }
+                        } else vCaption.style.display = 'none';
                         
                         viewer.style.display = 'flex';
                     };
@@ -1647,7 +1685,6 @@
                     document.getElementById('opt-del-msg').onclick = async () => {
                         document.getElementById('msg-action-sheet').style.display = 'none';
                         if (window.activeMsgKey) {
-                            // Silent Delete: Removes from Firebase without alert
                             await remove(ref(db, `chats/${currentCID}/${window.activeMsgKey}`));
                         }
                     };
@@ -1656,24 +1693,20 @@
                         document.getElementById('vo-viewer-screen').style.display = 'none';
                         document.getElementById('vo-viewer-content').innerHTML = '';
                         if (window.activeViewOnceKey) {
-                            // AUTO DESTRUCT THE MESSAGE FROM DB
                             await remove(ref(db, `chats/${currentCID}/${window.activeViewOnceKey}`));
                             window.activeViewOnceKey = null;
                         }
                     };
 
-                    // Helper to bind LONG PRESS (HOLD) functionality
                     function bindLongPress(element, key, content, type) {
                         let pressTimer;
-                        const start = (e) => {
+                        const start = () => {
                             if (pressTimer) clearTimeout(pressTimer);
                             pressTimer = setTimeout(() => {
                                 window.openMsgActions(key, content, type);
                             }, 600);
                         };
-                        const cancel = () => {
-                            if (pressTimer) clearTimeout(pressTimer);
-                        };
+                        const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
 
                         element.addEventListener('touchstart', start, {passive: true});
                         element.addEventListener('touchend', cancel);
@@ -1684,11 +1717,8 @@
                         element.addEventListener('mouseleave', cancel);
                     }
 
-                    // =========================================
-                    // CHAT SCREEN
-                    // =========================================
+                    // OPEN CHAT SCREEN
                     async function openChat(friend, isVerified = false) {
-                        // KILL ALL PREVIOUS CHAT LISTENERS BEFORE ADDING NEW ONES
                         if(unsubChatAdded) { unsubChatAdded(); unsubChatAdded = null; }
                         if(unsubChatChanged) { unsubChatChanged(); unsubChatChanged = null; }
                         if(unsubChatRemoved) { unsubChatRemoved(); unsubChatRemoved = null; }
@@ -1701,7 +1731,6 @@
                         
                         const targetSnap = await get(ref(db, `users/${friend}/profilePic`));
                         const targetAvatarObj = document.getElementById('chat-target-avatar');
-                        
                         targetAvatarObj.innerHTML = targetSnap.val() ? `<img src="${targetSnap.val()}">` : `<i class="fas fa-user"></i>`;
                         
                         switchScreen('chat-screen');
@@ -1723,12 +1752,9 @@
 
                         const chatRef = ref(db, `chats/${currentCID}`);
 
-                        // NEW: ASSIGN UNSUBSCRIBE FUNCTIONS DIRECTLY
                         unsubChatRemoved = onChildRemoved(chatRef, (snap) => {
                             const domElement = document.getElementById(`msg-bubble-${snap.key}`);
-                            if (domElement) {
-                                domElement.remove();
-                            }
+                            if (domElement) domElement.remove();
                         });
 
                         unsubChatAdded = onChildAdded(chatRef, (snap) => {
@@ -1740,7 +1766,6 @@
                             }
 
                             const div = document.createElement('div');
-                            // Add an ID so we can silently remove/edit it
                             div.id = `msg-bubble-${snap.key}`;
                             div.className = `bubble ${isMyMsg ? 'sent' : 'received'}`;
                             
@@ -1748,9 +1773,7 @@
                             try {
                                 let bytes = CryptoJS.AES.decrypt(msg.text, SECRET_KEY);
                                 content = bytes.toString(CryptoJS.enc.Utf8);
-                            } catch(e) { 
-                                content = msg.text; 
-                            }
+                            } catch(e) { content = msg.text; }
                             
                             let captionDecrypted = "";
                             if (msg.caption) {
@@ -1763,10 +1786,8 @@
                             const badge = (msg.sender === ADMIN_USER) ? `<span class="dev-badge">DEVELOPER</span><br>` : "";
                             const editedTag = msg.isEdited ? `<span class="edited-tag">(edited)</span>` : "";
                             
-                            // RENDER VIEW ONCE LOGIC
                             if (msg.isViewOnce) {
                                 if (isMyMsg) {
-                                    // I sent it: Just show a bomb icon to indicate it's a View Once message.
                                     div.innerHTML = `
                                         ${badge}
                                         <i class="fas fa-bomb" style="color:var(--view-once-color);"></i> [View Once Sent]
@@ -1774,20 +1795,16 @@
                                             <i class="fas fa-check-double"></i>
                                         </span>
                                     `;
-                                    // Bind Long Press for Unsend
                                     bindLongPress(div, snap.key, content, msg.type);
                                 } else {
-                                    // Receiver sees a locked bubble
                                     div.className = "locked-vo-bubble";
                                     div.innerHTML = `
                                         <i class="fas fa-lock" style="font-size:24px;"></i>
                                         <div><b>Secret ${msg.type.toUpperCase()}</b><br><small>Tap to view & destroy</small></div>
                                     `;
-                                    // Touch/Click to open view once media
                                     div.onclick = () => window.openViewOnceMedia(snap.key, content, msg.type, captionDecrypted);
                                 }
                             } else {
-                                // STANDARD RENDER LOGIC
                                 let mediaHTML = `<span>${content}</span>`;
                                 if(msg.type === 'image') {
                                     mediaHTML = `<img src="${content}" style="width:100%; border-radius:8px; margin-top:5px;">`;
@@ -1801,7 +1818,6 @@
                                         </div>
                                     `;
                                 } else if(msg.type === 'file') {
-                                    /* UPDATE: Added rel="noopener noreferrer" for Security */
                                     mediaHTML = `
                                         <a href="${content}" target="_blank" rel="noopener noreferrer" class="file-attachment">
                                             <i class="fas fa-file-alt"></i>
@@ -1824,35 +1840,25 @@
                                     </span>
                                 `;
                                 
-                                // Only my messages get the Long Press to Edit/Unsend
-                                if (isMyMsg) {
-                                    bindLongPress(div, snap.key, content, msg.type);
-                                }
+                                if (isMyMsg) bindLongPress(div, snap.key, content, msg.type);
                             }
                             
                             body.appendChild(div);
                             body.scrollTop = body.scrollHeight;
                         });
 
-                        // Handle Edit UI update without refresh
                         unsubChatChanged = onChildChanged(chatRef, (snap) => {
                             const updatedMsg = snap.val();
                             const domElement = document.getElementById(`msg-bubble-${snap.key}`);
-                            
                             if (domElement) {
-                                // Update Read Ticks
                                 if (updatedMsg.sender === currentUser && updatedMsg.status === 'read') {
                                     const tickElement = document.getElementById(`tick-${snap.key}`);
-                                    if (tickElement) {
-                                        tickElement.classList.add('read');
-                                    }
+                                    if (tickElement) tickElement.classList.add('read');
                                 }
-                                // Update Edited Text content dynamically without refreshing
                                 if (updatedMsg.isEdited && updatedMsg.type === 'text') {
                                     try {
                                         let bytes = CryptoJS.AES.decrypt(updatedMsg.text, SECRET_KEY);
                                         let newText = bytes.toString(CryptoJS.enc.Utf8);
-                                        
                                         const isMyMsg = updatedMsg.sender === currentUser;
                                         const badge = (updatedMsg.sender === ADMIN_USER) ? `<span class="dev-badge">DEVELOPER</span><br>` : "";
                                         
@@ -1870,22 +1876,19 @@
                         });
                     }
 
-                    // =========================================
+                    document.getElementById('back-btn').onclick = () => showMain();
+
                     // MEDIA PREVIEW & UPLOAD LOGIC
-                    // =========================================
                     document.getElementById('vo-toggle-btn').onclick = (e) => {
                         isViewOnceActive = !isViewOnceActive;
-                        if(isViewOnceActive) {
-                            e.target.classList.add('active');
-                        } else {
-                            e.target.classList.remove('active');
-                        }
+                        if(isViewOnceActive) e.target.classList.add('active');
+                        else e.target.classList.remove('active');
                     };
 
                     document.getElementById('close-preview-btn').onclick = () => {
                         document.getElementById('media-preview-screen').style.display = 'none';
                         pendingMediaFile = null;
-                        document.getElementById('file-input').value = ""; // reset
+                        document.getElementById('file-input').value = ""; 
                     };
 
                     document.getElementById('file-input').onchange = (e) => {
@@ -1893,7 +1896,7 @@
                         if(!file) return;
                         
                         pendingMediaFile = file;
-                        isViewOnceActive = false; // default off
+                        isViewOnceActive = false; 
                         document.getElementById('vo-toggle-btn').classList.remove('active');
                         document.getElementById('media-caption-input').value = "";
                         
@@ -1903,14 +1906,14 @@
                         if (file.type.startsWith('image/')) {
                             const imgUrl = URL.createObjectURL(file);
                             pContainer.innerHTML = `<img src="${imgUrl}">`;
-                            document.getElementById('vo-toggle-btn').style.display = 'flex'; // allow view once
+                            document.getElementById('vo-toggle-btn').style.display = 'flex'; 
                         } else if (file.type.startsWith('video/')) {
                             const vidUrl = URL.createObjectURL(file);
                             pContainer.innerHTML = `<video src="${vidUrl}" controls></video>`;
-                            document.getElementById('vo-toggle-btn').style.display = 'flex'; // allow view once
+                            document.getElementById('vo-toggle-btn').style.display = 'flex'; 
                         } else {
                             pContainer.innerHTML = `<i class="fas fa-file-alt" style="font-size:100px; color:var(--wa-action);"></i><br><p style="color:white; margin-top:20px;">${file.name}</p>`;
-                            document.getElementById('vo-toggle-btn').style.display = 'none'; // no view once for pure files
+                            document.getElementById('vo-toggle-btn').style.display = 'none'; 
                         }
                         
                         document.getElementById('media-preview-screen').style.display = 'flex';
@@ -1922,7 +1925,6 @@
                         const caption = document.getElementById('media-caption-input').value.trim();
                         const viewOnceStatus = isViewOnceActive;
                         
-                        // FIX: Clear immediately to prevent multiple clicks uploading 5 times
                         pendingMediaFile = null;
                         document.getElementById('file-input').value = ""; 
                         
@@ -1932,22 +1934,14 @@
                         
                         try {
                             if (file.type.startsWith('image/')) {
-                                // IMGBB UPLOAD FOR IMAGES
                                 const fd = new FormData();
                                 fd.append("image", file);
-                                
-                                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { 
-                                    method: "POST", body: fd 
-                                });
+                                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
                                 const data = await res.json();
-                                
                                 if(data.success) {
                                     await sendMessageToFirebase(data.data.url, 'image', caption, viewOnceStatus);
-                                } else {
-                                    alert("Image upload failed! Please try again.");
-                                }
+                                } else alert("Image upload failed!");
                             } else {
-                                // CLOUDINARY UPLOAD FOR VIDEO & FILES
                                 const timestamp = Math.round((new Date).getTime() / 1000);
                                 const signatureString = `timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
                                 const signature = CryptoJS.SHA1(signatureString).toString(CryptoJS.enc.Hex);
@@ -1958,23 +1952,17 @@
                                 fd.append("timestamp", timestamp);
                                 fd.append("signature", signature);
                                 
-                                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, { 
-                                    method: "POST", body: fd 
-                                });
+                                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, { method: "POST", body: fd });
                                 const data = await res.json();
-                                
                                 if(data.secure_url) {
                                     let messageType = file.type.startsWith('video/') ? 'video' : 'file';
                                     await sendMessageToFirebase(data.secure_url, messageType, caption, viewOnceStatus);
-                                } else {
-                                    alert("Upload failed! Server response: " + (data.error ? data.error.message : "Unknown error"));
-                                }
+                                } else alert("Upload failed!");
                             }
                         } catch (error) {
                             alert("Network error during upload.");
                         }
                         
-                        // Cleanup after send
                         btn.innerHTML = oldHTML;
                         document.getElementById('media-preview-screen').style.display = 'none';
                     };
@@ -2006,255 +1994,164 @@
 
                         try {
                             let targetUID = chatFriend;
-                            try {
-                                const friendSnap = await get(ref(db, `users/${chatFriend}`));
-                                if(friendSnap.exists() && friendSnap.val().uid) { 
-                                    targetUID = friendSnap.val().uid; 
-                                }
-                            } catch(fetchErr) {}
+                            const friendSnap = await get(ref(db, `users/${chatFriend}`));
+                            if(friendSnap.exists() && friendSnap.val().uid) targetUID = friendSnap.val().uid; 
                             
-                        } catch (e) {
-                            console.error("Firebase send operation finalized.");
-                        }
+                            fetch("/.netlify/functions/sendPush", {
+                                method: "POST",
+                                body: JSON.stringify({ targetUID: targetUID, senderName: currentUser })
+                            }).catch(e => {});
+                        } catch(err) {}
                     }
 
-                    // =========================================
-                    // TEXT AND VOICE NOTE SENDING LOGIC
-                    // =========================================
+                    // CHAT INPUT & VOICE NOTE ENGINE
                     const sendBtn = document.getElementById('send-btn');
                     const msgInput = document.getElementById('msg-input');
-                    const sendIcon = document.getElementById('send-icon');
                     const recordingUI = document.getElementById('recording-ui');
-                    const recordTimer = document.getElementById('record-timer');
+                    const recordTimerTxt = document.getElementById('record-timer');
+                    const sendIcon = document.getElementById('send-icon');
+                    const attachmentBtn = document.getElementById('attachment-btn');
+
+                    sendBtn.oncontextmenu = (e) => e.preventDefault();
 
                     msgInput.addEventListener('input', () => {
-                        if(msgInput.value.trim() !== "") {
+                        if (msgInput.value.trim().length > 0) {
                             sendIcon.className = "fas fa-paper-plane action-icon";
                         } else {
                             sendIcon.className = "fas fa-microphone action-icon";
                         }
                     });
 
-                    // TEXT SEND
-                    sendBtn.onclick = async () => {
-                        if (isRecording) {
-                            stopRecordingUI(false); 
-                            return;
+                    msgInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            sendTextMessage();
                         }
+                    });
 
+                    async function sendTextMessage() {
                         const text = msgInput.value.trim();
                         if (!text) return;
-                        msgInput.value = "";
+                        
+                        msgInput.value = '';
                         sendIcon.className = "fas fa-microphone action-icon";
                         
-                        const encrypted = CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
-                        await push(ref(db, `chats/${currentCID}`), {
+                        const encryptedText = CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
+                        const msgData = {
                             sender: currentUser,
-                            text: encrypted,
+                            text: encryptedText,
                             type: 'text',
+                            isViewOnce: false,
                             status: 'sent',
-                            timestamp: serverTimestamp(),
-                            isViewOnce: false
-                        });
+                            timestamp: serverTimestamp()
+                        };
+                        
+                        await push(ref(db, `chats/${currentCID}`), msgData);
+                        
+                        if (chatFriend === ADMIN_USER) {
+                            await update(ref(db, `admin_inbox/${currentUser}`), {
+                                last: text,
+                                timestamp: serverTimestamp()
+                            });
+                            notifyTelegram(`Message from @${currentUser}: ` + text);
+                        }
+                        
+                        try {
+                            let targetUID = chatFriend;
+                            const friendSnap = await get(ref(db, `users/${chatFriend}`));
+                            if (friendSnap.exists() && friendSnap.val().uid) {
+                                targetUID = friendSnap.val().uid;
+                            }
+                            fetch("/.netlify/functions/sendPush", {
+                                method: "POST",
+                                body: JSON.stringify({ targetUID: targetUID, senderName: currentUser })
+                            }).catch(e => {});
+                        } catch(err) {}
+                    }
 
-                        if(chatFriend === ADMIN_USER) {
-                            await update(ref(db, `admin_inbox/${currentUser}`), { last: text, timestamp: serverTimestamp() });
-                            notifyTelegram(text);
+                    sendBtn.onclick = () => {
+                        const text = msgInput.value.trim();
+                        if (text.length > 0) {
+                            sendTextMessage();
+                        } else {
+                            if (!isRecording) {
+                                startRecording();
+                            } else {
+                                stopRecordingAndSend();
+                            }
                         }
                     };
 
-                    // HOLD TO RECORD LOGIC (Mobile Friendly)
-                    let startY = 0;
-                    sendBtn.addEventListener('touchstart', async (e) => {
-                        if (msgInput.value.trim() !== "") return; 
-                        
-                        e.preventDefault();
-                        startX = e.touches[0].clientX;
-                        startY = e.touches[0].clientY;
-                        
+                    async function startRecording() {
                         try {
                             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                             mediaRecorder = new MediaRecorder(stream);
                             audioChunks = [];
                             
-                            mediaRecorder.ondataavailable = event => {
-                                if (event.data.size > 0) audioChunks.push(event.data);
+                            mediaRecorder.ondataavailable = (e) => {
+                                if (e.data.size > 0) audioChunks.push(e.data);
                             };
                             
                             mediaRecorder.onstop = async () => {
                                 stream.getTracks().forEach(track => track.stop());
-                                if (isCancelled) return;
-                                
                                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                                if (audioBlob.size < 1000) return;
                                 
                                 const timestamp = Math.round((new Date).getTime() / 1000);
                                 const signatureString = `timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
                                 const signature = CryptoJS.SHA1(signatureString).toString(CryptoJS.enc.Hex);
 
                                 const fd = new FormData();
-                                fd.append("file", audioBlob);
+                                fd.append("file", audioBlob, "voice_note.webm");
                                 fd.append("api_key", CLOUDINARY_API_KEY);
                                 fd.append("timestamp", timestamp);
                                 fd.append("signature", signature);
                                 
                                 try {
-                                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, { method: "POST", body: fd });
+                                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, {
+                                        method: "POST", body: fd
+                                    });
                                     const data = await res.json();
-                                    if(data.secure_url) {
-                                        await sendMessageToFirebase(data.secure_url, 'audio', '', false);
+                                    if (data.secure_url) {
+                                        await sendMessageToFirebase(data.secure_url, 'audio');
                                     }
-                                } catch(err) { console.error(err); }
+                                } catch(e) {
+                                    alert("Failed to send voice note.");
+                                }
                             };
                             
                             mediaRecorder.start();
                             isRecording = true;
-                            isCancelled = false;
-                            
-                            msgInput.style.display = 'none';
-                            recordingUI.style.display = 'flex';
-                            
                             recordSeconds = 0;
-                            recordTimer.innerText = "00:00";
+                            recordTimerTxt.innerText = "00:00";
+                            recordingUI.style.display = 'flex';
+                            msgInput.style.display = 'none';
+                            attachmentBtn.style.display = 'none';
+                            
                             recordTimerInterval = setInterval(() => {
                                 recordSeconds++;
-                                const m = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
-                                const s = String(recordSeconds % 60).padStart(2, '0');
-                                recordTimer.innerText = `${m}:${s}`;
+                                const mins = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+                                const secs = String(recordSeconds % 60).padStart(2, '0');
+                                recordTimerTxt.innerText = `${mins}:${secs}`;
                             }, 1000);
                             
                         } catch(err) {
-                            alert("Microphone permission denied! Please allow access in settings.");
+                            alert("Microphone permission required for voice notes!");
                         }
-                    }, {passive: false});
-
-                    sendBtn.addEventListener('touchmove', (e) => {
-                        if(!isRecording) return;
-                        const currentX = e.touches[0].clientX;
-                        if(startX - currentX > 50) { 
-                            isCancelled = true;
-                            stopRecordingUI(true);
-                        }
-                    }, {passive: false});
-
-                    sendBtn.addEventListener('touchend', (e) => {
-                        if(msgInput.value.trim() !== "") return; 
-                        if(isRecording) stopRecordingUI(false);
-                    });
-
-                    function stopRecordingUI(cancelStatus) {
-                        isCancelled = cancelStatus;
-                        if(mediaRecorder && mediaRecorder.state !== "inactive") {
-                            mediaRecorder.stop();
-                        }
-                        isRecording = false;
-                        clearInterval(recordTimerInterval);
-                        recordingUI.style.display = 'none';
-                        msgInput.style.display = 'block';
                     }
 
-                    // =========================================
-                    // GENERAL UI AND BUTTON HANDLERS
-                    // =========================================
-                    document.getElementById('back-btn').onclick = showMain;
-                    
-                    document.getElementById('logout-btn').onclick = () => {
-                        signOut(auth).then(() => {
-                            window.location.reload();
-                        });
-                    };
-                    
-                    document.getElementById('app-details-btn').onclick = () => {
-                        document.getElementById('dropdown-menu').style.display = 'none';
-                        switchScreen('app-details-screen');
-                    };
-                    
-                    document.getElementById('save-user-btn').onclick = async () => {
-                        const uname = document.getElementById('setup-username').value.trim().toLowerCase();
-                        if(uname.length < 3) return alert("Username is too short! Minimum 3 characters required.");
-                        
-                        const check = await get(ref(db, `users/${uname}`));
-                        if(check.exists()) return alert("Username already taken! Please choose another one.");
-                        
-                        let finalPfp = tempPfpUrl;
-                        const pfpFile = document.getElementById('pfp-input-setup').files[0];
-                        if(pfpFile) {
-                            const btn = document.getElementById('save-user-btn');
-                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPLOADING...';
-                            const fd = new FormData();
-                            fd.append("image", pfpFile);
-                            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
-                            const data = await res.json();
-                            if(data.success) finalPfp = data.data.url;
-                            btn.innerHTML = 'NEXT STEP <i class="fas fa-arrow-right"></i>';
+                    function stopRecordingAndSend() {
+                        if (mediaRecorder && isRecording) {
+                            clearInterval(recordTimerInterval);
+                            mediaRecorder.stop();
+                            isRecording = false;
+                            recordingUI.style.display = 'none';
+                            msgInput.style.display = 'block';
+                            attachmentBtn.style.display = 'inline-block';
                         }
-                        
-                        await set(ref(db, `users/${uname}`), {
-                            uid: currentUID,
-                            profilePic: finalPfp,
-                            joined: serverTimestamp()
-                        });
-                        
-                        await set(ref(db, `userMapping/${currentUID}`), uname);
-                        
-                        currentUser = uname;
-                        switchScreen('referral-screen');
-                    };
+                    }
 
-                    document.getElementById('skip-ref-btn').onclick = showMain;
-                    
-                    document.getElementById('apply-ref-btn').onclick = async () => {
-                        const code = document.getElementById('ref-code-input').value.trim();
-                        if (!code) return;
-                        alert("Referral logic processed successfully.");
-                        showMain();
-                    };
-
-                    document.getElementById('add-friend-btn').onclick = () => {
-                        const target = prompt("Enter the exact Username to add friend:");
-                        if(!target || target.toLowerCase() === currentUser.toLowerCase()) return;
-                        
-                        get(ref(db, `users/${target.toLowerCase()}`)).then(snap => {
-                            if(snap.exists()) {
-                                set(ref(db, `friend_requests/${target.toLowerCase()}/${currentUser}`), true)
-                                .then(() => alert("Friend Request Sent Successfully!"));
-                            } else {
-                                alert("User not found! Please check the username and try again.");
-                            }
-                        });
-                    };
-
-                    document.getElementById('menu-btn-trigger').onclick = (e) => {
-                        const menu = document.getElementById('dropdown-menu');
-                        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-                        e.stopPropagation();
-                    };
-
-                    document.addEventListener('click', () => {
-                        const menu = document.getElementById('dropdown-menu');
-                        if (menu && menu.style.display === 'block') {
-                            menu.style.display = 'none';
-                        }
-                    });
-
-                    // Talk to Developer Button Logic
-                    document.getElementById('talk-dev-btn').onclick = () => {
-                        document.getElementById('dropdown-menu').style.display = 'none';
-                        openChat(ADMIN_USER);
-                    };
-
-                    // Profile Pic Setup Preview
-                    document.getElementById('pfp-input-setup').onchange = (e) => {
-                        if(e.target.files && e.target.files[0]) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                document.getElementById('pfp-preview').src = e.target.result;
-                                document.getElementById('pfp-preview').style.display = 'block';
-                                document.getElementById('pfp-icon').style.display = 'none';
-                            }
-                            reader.readAsDataURL(e.target.files[0]);
-                        }
-                    };
-
+                }).catch((err) => {
+                    console.error("Firebase Initialization Error:", err);
                 });
             });
         });
