@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ACANZA Pro Max | Advanced Settings & Profile Management</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        /* =========================================
+           ACANZA PRO MAX THEME VARIABLES
+           ========================================= */
+        :root { 
+            --wa-green: #00a884; 
+            --wa-dark: #0b141a; 
+            --wa-panel: #202c33; 
+            --wa-panel-hover: #2a3942;
+            --wa-text: #e9edef; 
+            --wa-secondary: #8696a0; 
+            --error: #ff3b30;
+            --blue-tick: #34b7f1;
+            --primary: #8b5cf6;
+            --secondary: #d946ef;
+            --gold-shine: #ffd700;
+            --gold-dark: #ccaa00;
+            --ig-color: #e1306c;
+            --yt-color: #ff0000;
+            --tg-color: #0088cc;
+            --wa-brand: #25D366;
+            --x-color: #ffffff;
+            --fb-color: #1877F2;
+            --snap-color: #FFFC00;
+        }
+
+        /* =========================================
+           GLOBAL RESET & SCROLLBAR
+           ========================================= */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+        }
+        
+        body { 
+            background-color: var(--wa-dark); 
+            color: var(--wa-text); 
+            overflow-x: hidden; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--wa-panel);
+            border-radius: 10px;
+        }
+        
+        /* =========================================
+           ANIMATIONS & OVERLAYS
+           ========================================= */
+        @keyframes rotate { 
+            100% { transform: rotate(360deg); } 
+        }
+
+        @keyframes pulsePurpleGlow {
+            0% { box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+            100% { box-shadow: 0 0 35px rgba(168, 85, 247, 0.9); }
+        }
+
+        /* UPLOADING OVERLAY FOR PROFILE PICTURE */
+        #upload-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 10;
+        }
+        .mini-spinner {
+            width: 25px; height: 25px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: rotate 1s linear infinite;
+        }
+
+        /* =========================================
+           HEADER NAVIGATION
+           ========================================= */
+        header { 
+            background: var(--wa-panel); 
+            padding: 18px 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        .back-btn { 
+            font-size: 22px; 
+            color: var(--wa-text); 
+            text-decoration: none; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            transition: 0.2s;
+        }
+        .back-btn:active { transform: scale(0.9); }
+
+        /* =========================================
+           PROFILE HERO SECTION
+           ========================================= */
+        .profile-hero { 
+            padding: 40px 20px; 
+            text-align: center; 
+            background: linear-gradient(180deg, var(--wa-panel) 0%, var(--wa-dark) 100%);
+            border-bottom: 1px solid #222; 
+        }
+        .avatar-container { 
+            position: relative; 
+            display: inline-block; 
+            margin-bottom: 15px;
+        }
+        
+        #main-avatar { 
+            width: 140px; 
+            height: 140px; 
+            border-radius: 50%; 
+            border: 4px solid var(--wa-green); 
+            object-fit: cover; 
+            background: #2a3942; 
+            display: block;
+            box-shadow: 0 8px 20px rgba(0, 168, 132, 0.2);
+        }
+        
+        .cam-btn { 
+            position: absolute; 
+            bottom: 5px; 
+            right: 5px; 
+            background: var(--wa-green); 
+            color: white;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%; 
+            font-size: 16px; 
+            cursor: pointer; 
+            border: 3px solid var(--wa-dark); 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            transition: 0.2s;
+            z-index: 20;
+        }
+        .cam-btn:active { transform: scale(0.9); background: #008f6f; }
+
+        #display-username { 
+            font-size: 26px; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            letter-spacing: 0.5px;
+        }
+
+        #pro-badge {
+            display: inline-block;
+            background: rgba(0, 168, 132, 0.1);
+            color: var(--wa-green); 
+            font-size: 12px; 
+            font-weight: 800; 
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 10px; 
+            border: 1px solid rgba(0, 168, 132, 0.3);
+            display: none;
+            letter-spacing: 1px;
+        }
+
+        /* BIO DISPLAY */
+        .profile-bio-display {
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--wa-secondary);
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        /* SOCIAL ICONS DISPLAY */
+        .social-links-display {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* Allows wrapping if too many icons */
+            gap: 12px;
+        }
+        .social-icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: none; /* Hidden until loaded */
+        }
+        .social-icon-btn:hover { transform: translateY(-3px); }
+        .bg-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .bg-yt { background: var(--yt-color); }
+        .bg-tg { background: var(--tg-color); }
+        .bg-wa { background: var(--wa-brand); }
+        .bg-x { background: #000000; border: 1px solid #333; }
+        .bg-fb { background: var(--fb-color); }
+        .bg-snap { background: var(--snap-color); color: #000 !important; }
+
+        /* =========================================
+           SETTINGS LIST & ITEMS
+           ========================================= */
+        .settings-list { padding: 15px; max-width: 800px; margin: 0 auto; }
+        
+        /* GOLDEN BUTTON */
+        .gold-shop-btn {
+            background: linear-gradient(135deg, var(--gold-shine) 0%, var(--gold-dark) 100%);
+            color: #000;
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 18px;
+            border-radius: 16px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+            margin-bottom: 15px;
+            transition: 0.3s ease;
+        }
+        .gold-shop-btn:active { transform: scale(0.98); box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3); }
+        .gold-shop-btn i { font-size: 22px; }
+
+        .section-title {
+            color: var(--wa-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin: 20px 0 10px 15px;
+            letter-spacing: 1px;
+        }
+
+        .item { 
+            background: var(--wa-panel); 
+            padding: 20px; 
+            border-radius: 16px; 
+            display: flex; 
+            align-items: center; 
+            gap: 18px; 
+            margin-bottom: 12px; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        .item:active { 
+            transform: scale(0.98); 
+            background: var(--wa-panel-hover); 
+        }
+        .item:hover { border-color: #334155; }
+        
+        .item i.main-icon { 
+            font-size: 24px; 
+            width: 35px; 
+            text-align: center; 
+        }
+        
+        .item-content { flex: 1; overflow: hidden; }
+        .item-content h4 { font-size: 16px; margin-bottom: 3px; font-weight: 600; }
+        .item-content p { 
+            font-size: 13px; 
+            color: var(--wa-secondary); 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        .item-arrow { color: #54656f; font-size: 14px; }
+
+        /* Social Platform Specific Colors in List */
+        .text-ig { color: var(--ig-color); }
+        .text-yt { color: var(--yt-color); }
+        .text-tg { color: var(--tg-color); }
+        .text-wa { color: var(--wa-brand); }
+        .text-x { color: var(--x-color); }
+        .text-fb { color: var(--fb-color); }
+        .text-snap { color: var(--snap-color); }
+
+        /* =========================================
+           SMART AD CONTAINER: "ICECREAM FRAME"
+           ========================================= */
+        .icecream-container {
+            background: rgba(11, 20, 26, 0.6);
+            border: 1px solid #2a3942;
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+            text-align: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* Padding to prevent bottom fixed ad from covering content */
+        .bottom-spacer { height: 70px; }
+
+        /* =========================================
+           MODAL & POPUP STYLES
+           ========================================= */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.85); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .modal-box { 
+            background: var(--wa-panel); 
+            width: 100%; 
+            max-width: 420px; 
+            padding: 30px; 
+            border-radius: 24px; 
+            text-align: center; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            border: 1px solid #2a3942;
+        }
+        
+        .modal-box h3 { margin-bottom: 10px; font-size: 20px; }
+        
+        .modal-box input, .modal-box textarea { 
+            width: 100%; 
+            background: #111b21; 
+            border: 1px solid #3b4a54; 
+            border-radius: 12px; 
+            color: white; 
+            padding: 15px; 
+            margin: 15px 0; 
+            outline: none; 
+            font-size: 16px; 
+            transition: 0.3s;
+        }
+        .modal-box input { text-align: center; }
+        .modal-box textarea { resize: none; text-align: left; height: 120px; font-family: inherit; }
+        .modal-box input:focus, .modal-box textarea:focus { border-color: var(--wa-green); }
+        
+        .primary-btn { 
+            background: var(--wa-green); 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            font-size: 15px;
+            cursor: pointer; 
+            width: 100%; 
+            margin-top: 10px;
+            transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 168, 132, 0.3);
+        }
+        .primary-btn:active { transform: translateY(2px); box-shadow: none; }
+        
+        .ghost-btn { 
+            background: transparent; 
+            color: var(--wa-secondary); 
+            border: none; 
+            margin-top: 15px; 
+            cursor: pointer; 
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* =========================================
+           VERSION FOOTER
+           ========================================= */
+        .app-version {
+            text-align: center;
+            color: #54656f;
+            font-size: 12px;
+            margin: 40px 0 20px;
+            letter-spacing: 1px;
+        }
+        .app-version span { color: var(--wa-green); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <h3 style="font-weight: 600; font-size: 19px;">Settings</h3>
+    </header>
+
+    <div class="profile-hero">
+        <div class="avatar-container">
+            <img id="main-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile Picture">
+            
+            <div id="upload-overlay">
+                <div class="mini-spinner"></div>
+            </div>
+            
+            <div class="cam-btn" onclick="triggerDPUpdate()" title="Update Profile Picture">
+                <i class="fas fa-camera"></i>
+            </div>
+            
+            <input type="file" id="dp-file-input" style="display:none;" accept="image/png, image/jpeg, image/jpg">
+        </div>
+        
+        <div id="display-username">
+            @<span id="u-name">loading...</span> 
+            <i class="fas fa-check-circle" id="verified-tick" style="display:none; color:var(--blue-tick); font-size: 22px;"></i>
+        </div>
+        <div id="pro-badge"><i class="fas fa-crown"></i> VERIFIED</div>
+
+        <div class="profile-bio-display" id="hero-bio">
+            Hey there! I am using ACANZA.
+        </div>
+        
+        <div class="social-links-display" id="hero-socials">
+            <a href="#" id="icon-ig" class="social-icon-btn bg-ig" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="#" id="icon-yt" class="social-icon-btn bg-yt" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="#" id="icon-tg" class="social-icon-btn bg-tg" target="_blank"><i class="fab fa-telegram-plane"></i></a>
+            <a href="#" id="icon-wa" class="social-icon-btn bg-wa" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" id="icon-x" class="social-icon-btn bg-x" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" id="icon-fb" class="social-icon-btn bg-fb" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" id="icon-snap" class="social-icon-btn bg-snap" target="_blank"><i class="fab fa-snapchat-ghost"></i></a>
+            </div>
+    </div>
+
+    <div class="settings-list">
+
+        <button class="gold-shop-btn" onclick="window.location.href='shop.html'">
+            <i class="fas fa-store"></i> Visit ACANZA Golden Shop
+        </button>
+
+        <div class="icecream-container">
+            <p style="font-size: 11px; color: var(--gold-shine); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Sponsor Showcase</p>
+            <script async="async" data-cfasync="false" src="https://pl29315167.profitablecpmratenetwork.com/75ae8e7d50bf72473bf483baadd4bd3d/invoke.js"></script>
+            <div id="container-75ae8e7d50bf72473bf483baadd4bd3d"></div>
+        </div>
+        <div class="section-title">Account Setup</div>
+        
+        <div class="item" onclick="openBioUpdate()">
+            <i class="fas fa-info-circle main-icon" style="color: #00a884;"></i>
+            <div class="item-content">
+                <h4>Profile Bio</h4>
+                <p id="list-bio-preview">Hey there! I am using ACANZA.</p>
+            </div>
+            <i class="fas fa-chevron-right item-arrow"></i>
+        </div>
+
+        <div class="item" onclick="openNameUpdate()">
+            <i class="fas fa-user-tag main-icon" style="color: #34b7f1;"></i>
+            <div class="item-content">
+                <h4>Change Username</h4>
+                <p>Update your unique identity</p>
+            </div>
+            <i class="fas fa-chevron-right item-arrow"></i>
+        </div>
+
+        <div class="item" onclick="showInvite()">
+            <i class="fas fa-qrcode main-icon" style="color: #8b5cf6;"></i>
+            <div class="item-content">
+                <h4>Invite QR Code</h4>
+                <p>Share your profile to add friends</p>
+            </div>
+            <i class="fas fa-chevron-right item-arrow"></i>
+        </div>
+
+        <div class="section-title">Social Connections</div>
+
+        <div class="item" onclick="openSocialUpdate('instagram')">
+            <i class="fab fa-instagram main-icon text-ig"></i>
+            <div class="item-content">
+                <h4>Instagram</h4>
+                <p id="list-ig">Not connected</p>
+            </div>
+            <i class="fas fa-link item-arrow"></i>
+        </div>
+
+        <div class="item" onclick="openSocialUpdate('youtube')">
+            <i class="fab fa-youtube main-icon text-yt"></i>
+            <div class="item-content">
+                <h4>YouTube Channel</h4>
+                <p id="list-yt">Not connected</p>
+            </div>
+            <i class="fas fa-link item-arrow"></i>
+        </div>
+
+        <div class="item" onclick="openSocialUpdate('x')">
+            <i class="fa-brands fa-x-twitter main-icon text-x"></i>
+            <div class="item-content">
+                <h4>X (Twitter)</h4>
+                <p id="list-x">Not connected</p>
+            </div>
+            <i class="fas fa-link item-arrow"></i>
+        </div>
+
+        <div class="item" onclick="openSocialUpdate('facebook')">
+            <i class="fab fa-facebook-f main-icon text-fb"></i>
+            <div class="item-content">
+                <h4>Facebook</h4>
+                <p id="list-fb">Not connected</p>
+            </div>
+            <i class="fas fa-link item-arrow"></i>
+        </div>
+
+        <div class="item" onclick="openSocialUpdate('snapchat')">
+            <i class="fab fa-snapchat-ghost main-icon text-snap"></i>
+            <div class="item-content">
+                <h4>Snapchat</h4>
+                <p id="list-snap">Not connected</p>
+            </div>
+            <i class="fas fa-link item-arrow"></i>
+        </div>
+
+        <div class="item" onclick="openSocialUpdate('telegram')">
+            <i class="fab fa-telegram-plane main-icon text-tg"></i>
+            <div class="item-content">
+                <h4>Telegram Channel/User</h4>
+                <p id="list-tg">Not connected</p>
+            </div>
+            <i class="fas fa-link item-arrow"></i>
+        </div>
+
+        <div class="item" onclick="openSocialUpdate('whatsapp')">
+            <i class="fab fa-whatsapp main-icon text-wa"></i>
+            <div class="item-content">
+                <h4>WhatsApp Number</h4>
+                <p id="list-wa">Not connected</p>
+            </div>
+            <i class="fas fa-link item-arrow"></i>
+        </div>
+
+        <div class="item" onclick="openCustomConnectionModal()" style="border: 1px dashed var(--primary); margin-top: 15px;">
+            <i class="fas fa-plus-circle main-icon" style="color: var(--primary);"></i>
+            <div class="item-content">
+                <h4>Add Another Connection</h4>
+                <p>Website, second number, portfolio, etc.</p>
+            </div>
+            <i class="fas fa-plus item-arrow" style="color: var(--primary);"></i>
+        </div>
+
+        <div id="custom-connections-list"></div>
+
+        <div class="section-title">System & Security</div>
+
+        <div class="item" onclick="logout()">
+            <i class="fas fa-power-off main-icon" style="color: var(--error);"></i>
+            <div class="item-content">
+                <h4 style="color: var(--error);">Sign Out</h4>
+                <p>Securely log out from this device</p>
+            </div>
+        </div>
+        
+        <div class="app-version">
+            ACANZA PRO MAX <span>v3.5.0</span><br>
+            Developed by S-PROJECTS
+        </div>
+
+        <div class="bottom-spacer"></div>
+    </div>
+
+    <div style="position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; background: #0b141a; padding: 5px 0; border-top: 1px solid #202c33; z-index: 90;">
+        <script>
+          atOptions = {
+            'key' : 'ddcdc49a598e8289aae0ec213ca78dfa',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
+        </script>
+        <script src="https://www.highperformanceformat.com/ddcdc49a598e8289aae0ec213ca78dfa/invoke.js"></script>
+    </div>
+    <div id="bio-modal" class="modal">
+        <div class="modal-box">
+            <h3 style="font-size: 22px; margin-bottom: 5px;">Update Profile Bio</h3>
+            <p style="font-size: 12px; color: var(--wa-secondary);">Express yourself. Max 500 characters.</p>
+            <textarea id="bio-input" placeholder="Write something about yourself..." maxlength="500"></textarea>
+            <div style="text-align: right; font-size: 11px; color: var(--wa-secondary); margin-top: -10px; margin-bottom: 10px;">
+                <span id="bio-counter">0</span> / 500
+            </div>
+            <button class="primary-btn" id="bio-save-btn" onclick="saveBio()">SAVE BIO</button>
+            <button class="ghost-btn" onclick="closeAll()">CANCEL</button>
+        </div>
+    </div>
+
+    <div id="social-modal" class="modal">
+        <div class="modal-box">
+            <h3 style="font-size: 22px; margin-bottom: 5px;" id="social-modal-title">Link Social</h3>
+            <p style="font-size: 12px; color: var(--wa-secondary);" id="social-modal-desc">Enter your username or link.</p>
+            <input type="hidden" id="social-platform-hidden">
+            <input type="text" id="social-input" placeholder="...">
+            <button class="primary-btn" id="social-save-btn" onclick="saveSocial()">SAVE LINK</button>
+            <button class="ghost-btn" onclick="closeAll()">CANCEL</button>
+        </div>
+    </div>
+
+    <div id="name-modal" class="modal">
+        <div class="modal-box">
+            <h3 style="font-size: 22px; margin-bottom: 5px;">Update Username</h3>
+            <p style="font-size: 12px; color: var(--wa-secondary);">Must be unique. No spaces allowed.</p>
+            <input type="text" id="new-user-input" placeholder="e.g. shoheb_pro" maxlength="15">
+            <button class="primary-btn" id="name-save-btn" onclick="applyNameChange()">SAVE CHANGES</button>
+            <button class="ghost-btn" onclick="closeAll()">CANCEL</button>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="modal">
+        <div class="modal-box">
+            <h3 style="font-size: 22px;">Scan to Chat</h3>
+            <p style="font-size: 12px; color: var(--wa-secondary); margin-top: 5px;">Ask your friend to scan this code.</p>
+            <div id="qr-display" style="background: white; padding: 15px; border-radius: 16px; display: inline-block; margin: 20px 0; box-shadow: 0 5px 15px rgba(255,255,255,0.1);"></div>
+            <h2 id="qr-username" style="color:var(--wa-green); letter-spacing: 1px; margin-bottom: 15px;"></h2>
+            <button class="primary-btn" onclick="closeAll()">DONE</button>
+        </div>
+    </div>
+
+    <div id="custom-link-modal" class="modal">
+        <div class="modal-box">
+            <h3 style="font-size: 22px; margin-bottom: 5px;">Add Custom Connection</h3>
+            <p style="font-size: 12px; color: var(--wa-secondary);">Add your website, portfolio, or mobile number.</p>
+            
+            <input type="text" id="custom-link-title" placeholder="Name (e.g. My Website, 2nd Number)">
+            <input type="text" id="custom-link-url" placeholder="Enter full Link or Mobile Number">
+            
+            <button class="primary-btn" id="custom-save-btn" onclick="saveCustomConnection()">SAVE CONNECTION</button>
+            <button class="ghost-btn" onclick="closeAll()">CANCEL</button>
+        </div>
+    </div>
+
+    <script>
+        // =========================================
+        // FIREBASE CONFIGURATION
+        // =========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYX1lrxHre2bYKzZfOMM3WWwIKHPySI9I",
+            authDomain: "chat-81c0c.firebaseapp.com",
+            databaseURL: "https://chat-81c0c-default-rtdb.firebaseio.com",
+            projectId: "chat-81c0c",
+            appId: "1:852591586864:web:db877a72adbb742d5287f5"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        
+        // SYSTEM CONSTANTS
+        const IMGBB_KEY = "5d7c00f51bb00a66f6c70b9f05f04645";
+
+        let myUID = "";
+        let myUser = "";
+
+        // =========================================
+        // INITIALIZATION & SYNC LOGIC
+        // =========================================
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                myUID = user.uid;
+                try {
+                    // Fetch Username
+                    const snap = await db.ref('userMapping/' + myUID).get();
+                    if (snap.exists()) {
+                        myUser = snap.val();
+                        document.getElementById('u-name').innerText = myUser;
+                        
+                        // Load full profile details
+                        await loadUserData();
+                    } else {
+                        window.location.href = "index.html";
+                    }
+
+                } catch(e) {
+                    console.error("Sync Error:", e);
+                }
+            } else { 
+                window.location.href = "index.html"; 
+            }
+        });
+
+        // =========================================
+        // LOAD USER DATA (BIO, SOCIALS, DP, STATUS, CUSTOM LINKS)
+        // =========================================
+        async function loadUserData() {
+            const userSnap = await db.ref(`users/${myUser}`).get();
+            if(!userSnap.exists()) return;
+            
+            const data = userSnap.val();
+
+            // 1. Profile Picture
+            if(data.profilePic && data.profilePic !== "") {
+                document.getElementById('main-avatar').src = data.profilePic;
+            } else if(auth.currentUser.photoURL) {
+                document.getElementById('main-avatar').src = auth.currentUser.photoURL;
+            }
+
+            // 2. Profile Bio
+            if(data.bio) {
+                document.getElementById('hero-bio').innerText = data.bio;
+                document.getElementById('list-bio-preview').innerText = data.bio;
+            }
+
+            // 3. Social Media Links
+            if(data.socials) {
+                const s = data.socials;
+                
+                if(s.instagram) {
+                    document.getElementById('list-ig').innerText = "@" + s.instagram;
+                    document.getElementById('list-ig').style.color = "white";
+                    const icon = document.getElementById('icon-ig');
+                    icon.href = `https://instagram.com/${s.instagram}`;
+                    icon.style.display = 'flex';
+                }
+                
+                if(s.youtube) {
+                    document.getElementById('list-yt').innerText = s.youtube;
+                    document.getElementById('list-yt').style.color = "white";
+                    const icon = document.getElementById('icon-yt');
+                    icon.href = s.youtube.includes('http') ? s.youtube : `https://youtube.com/@${s.youtube}`;
+                    icon.style.display = 'flex';
+                }
+
+                if(s.x) {
+                    document.getElementById('list-x').innerText = "@" + s.x;
+                    document.getElementById('list-x').style.color = "white";
+                    const icon = document.getElementById('icon-x');
+                    icon.href = `https://x.com/${s.x}`;
+                    icon.style.display = 'flex';
+                }
+
+                if(s.facebook) {
+                    document.getElementById('list-fb').innerText = s.facebook;
+                    document.getElementById('list-fb').style.color = "white";
+                    const icon = document.getElementById('icon-fb');
+                    icon.href = `https://facebook.com/${s.facebook}`;
+                    icon.style.display = 'flex';
+                }
+
+                if(s.snapchat) {
+                    document.getElementById('list-snap').innerText = "@" + s.snapchat;
+                    document.getElementById('list-snap').style.color = "white";
+                    const icon = document.getElementById('icon-snap');
+                    icon.href = `https://snapchat.com/add/${s.snapchat}`;
+                    icon.style.display = 'flex';
+                }
+                
+                if(s.telegram) {
+                    document.getElementById('list-tg').innerText = "@" + s.telegram;
+                    document.getElementById('list-tg').style.color = "white";
+                    const icon = document.getElementById('icon-tg');
+                    icon.href = `https://t.me/${s.telegram}`;
+                    icon.style.display = 'flex';
+                }
+                
+                if(s.whatsapp) {
+                    document.getElementById('list-wa').innerText = "+" + s.whatsapp;
+                    document.getElementById('list-wa').style.color = "white";
+                    const icon = document.getElementById('icon-wa');
+                    icon.href = `https://wa.me/${s.whatsapp}`;
+                    icon.style.display = 'flex';
+                }
+            }
+
+            // 4. Custom Connections (NEW FEATURE)
+            const customContainer = document.getElementById('custom-connections-list');
+            customContainer.innerHTML = ""; // Clear existing custom UI elements
+            document.querySelectorAll('.custom-social-icon').forEach(e => e.remove()); // Clear from hero section
+
+            if(data.customLinks) {
+                const customLinks = data.customLinks;
+                for (let key in customLinks) {
+                    const linkData = customLinks[key];
+                    
+                    // Create Item in Settings List
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'item';
+                    itemDiv.innerHTML = `
+                        <i class="fas fa-link main-icon" style="color: var(--secondary);"></i>
+                        <div class="item-content">
+                            <h4>${linkData.title}</h4>
+                            <p style="color: white;">${linkData.url}</p>
+                        </div>
+                        <i class="fas fa-trash item-arrow" style="color: var(--error); cursor:pointer; font-size:18px;" onclick="deleteCustomConnection('${key}', event)" title="Delete"></i>
+                    `;
+                    customContainer.appendChild(itemDiv);
+
+                    // Create Icon in Hero Socials area
+                    const heroSocials = document.getElementById('hero-socials');
+                    const aTag = document.createElement('a');
+                    aTag.className = 'social-icon-btn custom-social-icon';
+                    aTag.style.display = 'flex';
+                    aTag.style.background = '#475569'; // Neutral Color
+                    
+                    // Logic to check if it's a mobile number or web link
+                    let finalUrl = linkData.url;
+                    let isNumber = /^\+?[0-9]+$/.test(finalUrl.replace(/\s+/g, ''));
+                    
+                    if (isNumber) {
+                        finalUrl = 'tel:' + finalUrl.replace(/\s+/g, '');
+                        aTag.innerHTML = '<i class="fas fa-phone-alt"></i>';
+                    } else {
+                        if (!finalUrl.startsWith('http') && !finalUrl.startsWith('mailto:') && !finalUrl.startsWith('tel:')) {
+                            finalUrl = 'https://' + finalUrl;
+                        }
+                        aTag.innerHTML = '<i class="fas fa-globe"></i>';
+                    }
+                    
+                    aTag.href = finalUrl;
+                    aTag.target = "_blank";
+                    heroSocials.appendChild(aTag);
+                }
+            }
+
+            // 5. Verification Status
+            const metaSnap = await db.ref(`users_meta/${myUID}/membership`).get();
+            if (metaSnap.exists()) {
+                const meta = metaSnap.val();
+                if (meta.active && Date.now() < meta.expiry) {
+                    document.getElementById('verified-tick').style.display = "inline-block";
+                    document.getElementById('pro-badge').style.display = "inline-block";
+                    document.getElementById('main-avatar').style.borderColor = "var(--blue-tick)";
+                }
+            }
+        }
+
+        // =========================================
+        // CUSTOM CONNECTION MANAGEMENT (NEW FEATURE)
+        // =========================================
+        function openCustomConnectionModal() {
+            document.getElementById('custom-link-title').value = "";
+            document.getElementById('custom-link-url').value = "";
+            document.getElementById('custom-link-modal').style.display = 'flex';
+        }
+
+        async function saveCustomConnection() {
+            const title = document.getElementById('custom-link-title').value.trim();
+            const url = document.getElementById('custom-link-url').value.trim();
+            
+            if(!title || !url) {
+                alert("Please fill both Name and Link/Number fields.");
+                return;
+            }
+
+            const btn = document.getElementById('custom-save-btn');
+            btn.innerText = "SAVING..."; btn.disabled = true;
+
+            try {
+                const newKey = Date.now().toString(); // Generate unique key
+                await db.ref(`users/${myUser}/customLinks/${newKey}`).set({
+                    title: title,
+                    url: url
+                });
+                closeAll();
+                await loadUserData(); // Refresh the UI
+            } catch(e) {
+                alert("Failed to save custom connection.");
+            }
+
+            btn.innerText = "SAVE CONNECTION"; btn.disabled = false;
+        }
+
+        async function deleteCustomConnection(key, event) {
+            event.stopPropagation(); // Stop clicking effect on the item
+            if(confirm("Are you sure you want to delete this custom connection?")) {
+                try {
+                    await db.ref(`users/${myUser}/customLinks/${key}`).remove();
+                    await loadUserData(); // Refresh UI after delete
+                } catch(e) {
+                    alert("Failed to delete.");
+                }
+            }
+        }
+
+        // =========================================
+        // BIO MANAGEMENT
+        // =========================================
+        const bioInput = document.getElementById('bio-input');
+        const bioCounter = document.getElementById('bio-counter');
+        
+        bioInput.addEventListener('input', () => {
+            bioCounter.innerText = bioInput.value.length;
+        });
+
+        function openBioUpdate() {
+            const currentBio = document.getElementById('hero-bio').innerText;
+            bioInput.value = currentBio === "Hey there! I am using ACANZA." ? "" : currentBio;
+            bioCounter.innerText = bioInput.value.length;
+            document.getElementById('bio-modal').style.display = 'flex';
+        }
+
+        async function saveBio() {
+            const val = bioInput.value.trim();
+            const btn = document.getElementById('bio-save-btn');
+            btn.innerText = "SAVING..."; btn.disabled = true;
+
+            try {
+                await db.ref(`users/${myUser}/bio`).set(val || "Hey there! I am using ACANZA.");
+                document.getElementById('hero-bio').innerText = val || "Hey there! I am using ACANZA.";
+                document.getElementById('list-bio-preview').innerText = val || "Hey there! I am using ACANZA.";
+                closeAll();
+            } catch(e) { alert("Failed to save Bio."); }
+            
+            btn.innerText = "SAVE BIO"; btn.disabled = false;
+        }
+
+        // =========================================
+        // SOCIAL MEDIA MANAGEMENT
+        // =========================================
+        function openSocialUpdate(platform) {
+            const titleObj = document.getElementById('social-modal-title');
+            const descObj = document.getElementById('social-modal-desc');
+            const inputObj = document.getElementById('social-input');
+            document.getElementById('social-platform-hidden').value = platform;
+            
+            if(platform === 'instagram') {
+                titleObj.innerText = "Instagram Link";
+                descObj.innerText = "Enter your IG username (e.g., ishowspeed)";
+                inputObj.placeholder = "Username only";
+            } else if (platform === 'youtube') {
+                titleObj.innerText = "YouTube Link";
+                descObj.innerText = "Enter your channel URL or @handle";
+                inputObj.placeholder = "@channel_name";
+            } else if (platform === 'x') {
+                titleObj.innerText = "X (Twitter) Link";
+                descObj.innerText = "Enter your X handle without @";
+                inputObj.placeholder = "Username only";
+            } else if (platform === 'facebook') {
+                titleObj.innerText = "Facebook Link";
+                descObj.innerText = "Enter your FB profile username";
+                inputObj.placeholder = "Username only";
+            } else if (platform === 'snapchat') {
+                titleObj.innerText = "Snapchat Link";
+                descObj.innerText = "Enter your Snapchat username";
+                inputObj.placeholder = "Username only";
+            } else if (platform === 'telegram') {
+                titleObj.innerText = "Telegram Link";
+                descObj.innerText = "Enter your TG username without @";
+                inputObj.placeholder = "Username only";
+            } else if (platform === 'whatsapp') {
+                titleObj.innerText = "WhatsApp Link";
+                descObj.innerText = "Enter number with country code (e.g., 919876543210)";
+                inputObj.placeholder = "Country code + Number";
+                inputObj.type = "number";
+            }
+
+            inputObj.value = "";
+            document.getElementById('social-modal').style.display = 'flex';
+        }
+
+        async function saveSocial() {
+            const platform = document.getElementById('social-platform-hidden').value;
+            let val = document.getElementById('social-input').value.trim();
+            const btn = document.getElementById('social-save-btn');
+            
+            if(!val) return closeAll();
+
+            if(platform === 'instagram' || platform === 'telegram' || platform === 'x' || platform === 'snapchat') {
+                val = val.replace('@', '');
+            }
+
+            btn.innerText = "SAVING..."; btn.disabled = true;
+
+            try {
+                await db.ref(`users/${myUser}/socials/${platform}`).set(val);
+                
+                if(platform === 'instagram') {
+                    document.getElementById('list-ig').innerText = "@" + val;
+                    document.getElementById('list-ig').style.color = "white";
+                    document.getElementById('icon-ig').href = `https://instagram.com/${val}`;
+                    document.getElementById('icon-ig').style.display = 'flex';
+                } else if(platform === 'youtube') {
+                    document.getElementById('list-yt').innerText = val;
+                    document.getElementById('list-yt').style.color = "white";
+                    document.getElementById('icon-yt').href = val.includes('http') ? val : `https://youtube.com/@${val}`;
+                    document.getElementById('icon-yt').style.display = 'flex';
+                } else if(platform === 'x') {
+                    document.getElementById('list-x').innerText = "@" + val;
+                    document.getElementById('list-x').style.color = "white";
+                    document.getElementById('icon-x').href = `https://x.com/${val}`;
+                    document.getElementById('icon-x').style.display = 'flex';
+                } else if(platform === 'facebook') {
+                    document.getElementById('list-fb').innerText = val;
+                    document.getElementById('list-fb').style.color = "white";
+                    document.getElementById('icon-fb').href = `https://facebook.com/${val}`;
+                    document.getElementById('icon-fb').style.display = 'flex';
+                } else if(platform === 'snapchat') {
+                    document.getElementById('list-snap').innerText = "@" + val;
+                    document.getElementById('list-snap').style.color = "white";
+                    document.getElementById('icon-snap').href = `https://snapchat.com/add/${val}`;
+                    document.getElementById('icon-snap').style.display = 'flex';
+                } else if(platform === 'telegram') {
+                    document.getElementById('list-tg').innerText = "@" + val;
+                    document.getElementById('list-tg').style.color = "white";
+                    document.getElementById('icon-tg').href = `https://t.me/${val}`;
+                    document.getElementById('icon-tg').style.display = 'flex';
+                } else if(platform === 'whatsapp') {
+                    document.getElementById('list-wa').innerText = "+" + val;
+                    document.getElementById('list-wa').style.color = "white";
+                    document.getElementById('icon-wa').href = `https://wa.me/${val}`;
+                    document.getElementById('icon-wa').style.display = 'flex';
+                }
+                
+                closeAll();
+            } catch(e) { alert("Failed to save link."); }
+
+            btn.innerText = "SAVE LINK"; btn.disabled = false;
+            document.getElementById('social-input').type = "text";
+        }
+
+        // =========================================
+        // PROFILE PICTURE UPLOAD (IMGBB)
+        // =========================================
+        function triggerDPUpdate() { document.getElementById('dp-file-input').click(); }
+
+        document.getElementById('dp-file-input').onchange = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            document.getElementById('upload-overlay').style.display = 'flex';
+            const fd = new FormData(); fd.append("image", file);
+            
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+                const data = await res.json();
+                
+                if(data.success) {
+                    const newUrl = data.data.url;
+                    await auth.currentUser.updateProfile({ photoURL: newUrl });
+                    await db.ref(`users/${myUser}`).update({ profilePic: newUrl });
+                    document.getElementById('main-avatar').src = newUrl;
+                } else { alert("Upload failed."); }
+            } catch(err) { alert("Server error."); } 
+            finally { document.getElementById('upload-overlay').style.display = 'none'; }
+        };
+
+        // =========================================
+        // USERNAME UPDATE LOGIC
+        // =========================================
+        function openNameUpdate() { 
+            document.getElementById('new-user-input').value = myUser; 
+            document.getElementById('name-modal').style.display = 'flex'; 
+        }
+        
+        async function applyNameChange() {
+            let val = document.getElementById('new-user-input').value.trim().toLowerCase().replace(/\s+/g, '');
+            if(val.length < 3 || val === myUser) return closeAll();
+            
+            const btn = document.getElementById('name-save-btn');
+            btn.innerText = "SAVING..."; btn.disabled = true;
+
+            try {
+                const check = await db.ref('users/' + val).get();
+                if(check.exists()) { 
+                    alert("Username already taken!"); 
+                    btn.innerText = "SAVE CHANGES"; 
+                    btn.disabled = false; 
+                    return; 
+                }
+                const updates = {};
+                const oldUserData = await db.ref('users/' + myUser).get();
+                updates[`users/${val}`] = oldUserData.val();
+                updates[`userMapping/${myUID}`] = val;
+                await db.ref().update(updates);
+                await db.ref('users/' + myUser).remove();
+                alert("Username Updated Successfully!"); 
+                location.reload();
+            } catch(e) { 
+                alert("Operation Failed"); 
+                btn.innerText = "SAVE CHANGES"; 
+                btn.disabled = false; 
+            }
+        }
+
+        // =========================================
+        // QR CODE DISPLAY
+        // =========================================
+        function showInvite() {
+            const area = document.getElementById('qr-display'); 
+            area.innerHTML = "";
+            new QRCode(area, { text: `@${myUser}`, width: 160, height: 160, colorDark: "#0b141a" });
+            document.getElementById('qr-username').innerText = `@${myUser}`;
+            document.getElementById('qr-modal').style.display = 'flex';
+        }
+
+        // =========================================
+        // MODAL CONTROLS & LOGOUT
+        // =========================================
+        function closeAll() { 
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
+        }
+        
+        function logout() { 
+            if(confirm("Are you sure you want to sign out from ACANZA?")) {
+                auth.signOut(); 
+            }
+        }
+        
+        window.onclick = function(e) { 
+            if(e.target.classList.contains('modal')) closeAll(); 
+        }
+    </script>
+    
+    <script src="https://pl29315166.profitablecpmratenetwork.com/ba/84/b0/ba84b0393de82651915a70c9b829ef30.js"></script>
+    </body>
+</html>

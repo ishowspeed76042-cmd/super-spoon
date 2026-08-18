@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ACANZA | Ultra Premium Profile Viewer</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           ACANZA ELITE DESIGN SYSTEM (ULTRA HEAVY NEO-DARK)
+           ========================================================================== */
+        :root {
+            /* Core Colors */
+            --bg-deep: #030608;
+            --panel-hex: #0a1118;
+            --panel-light: #121e29;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            /* Accent Colors */
+            --gold-glow: #ffd700;
+            --gold-dark: #ccaa00;
+            --blue-neon: #00f2ff;
+            --verified-blue: #34b7f1;
+            --danger-red: #ff3b30;
+            --success-green: #00a884;
+            --primary-purple: #8b5cf6;
+            
+            /* Social Brand Colors */
+            --ig-color: #e1306c;
+            --yt-color: #ff0000;
+            --tg-color: #0088cc;
+            --wa-brand: #25D366;
+            --x-color: #ffffff;
+            --fb-color: #1877F2;
+            --snap-color: #FFFC00;
+
+            /* Glassmorphism Effects */
+            --glass-bg: rgba(10, 17, 24, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* ==========================================================================
+           GLOBAL RESETS & TYPOGRAPHY
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Dynamic Background FX */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%; left: -20%;
+            width: 140%; height: 140%;
+            background: radial-gradient(circle at 50% 30%, #0d2136 0%, #030608 60%);
+            z-index: -2;
+            animation: pulseBg 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseBg {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* ==========================================================================
+           LOADER SCREEN (DIAMOND SHINE)
+           ========================================================================== */
+        #loader-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-deep);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .diamond-loader {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, var(--gold-glow), var(--gold-dark));
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            animation: pulseDiamond 1.5s infinite, spinDiamond 4s linear infinite;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        @keyframes pulseDiamond {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+        @keyframes spinDiamond {
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .loader-text {
+            margin-top: 30px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--gold-glow);
+            letter-spacing: 4px;
+            font-size: 14px;
+            text-transform: uppercase;
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        /* ==========================================================================
+           MAIN PROFILE WRAPPER
+           ========================================================================== */
+        #profile-wrapper {
+            display: none; /* Hidden until data is fully loaded */
+            flex-direction: column;
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==========================================================================
+           HEADER SYSTEM
+           ========================================================================== */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            background: transparent;
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
+        .nav-btn:active { transform: scale(0.95); }
+
+        /* ==========================================================================
+           HERO BANNER & AVATAR ENGINE
+           ========================================================================== */
+        .hero-section {
+            position: relative;
+            padding-top: 100px;
+            padding-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(13,33,54,0.8) 0%, var(--bg-deep) 100%);
+            border-bottom: 1px solid rgba(0, 242, 255, 0.1);
+        }
+
+        /* The Animated Avatar Container */
+        .avatar-engine {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--panel-hex);
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            background: #111;
+        }
+
+        /* Default Ring */
+        .standard-ring {
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            z-index: 1;
+            animation: spinSlow 15s linear infinite;
+        }
+
+        /* VIP Glowing Ring */
+        .vip-ring {
+            position: absolute;
+            top: -8px; left: -8px; right: -8px; bottom: -8px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: var(--gold-glow);
+            border-bottom-color: var(--blue-neon);
+            border-left-color: var(--verified-blue);
+            z-index: 10;
+            animation: spinFast 3s linear infinite, glowPulse 2s alternate infinite;
+            display: none; /* Controlled by JS */
+        }
+
+        @keyframes spinSlow { 100% { transform: rotate(360deg); } }
+        @keyframes spinFast { 100% { transform: rotate(-360deg); } }
+        @keyframes glowPulse {
+            0% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.3)); }
+            100% { filter: drop-shadow(0 0 25px rgba(0,242,255,0.8)); }
+        }
+
+        /* User Identity Area */
+        .identity-box {
+            text-align: center;
+            z-index: 10;
+        }
+
+        .username-title {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+
+        .vip-badge-icon {
+            color: var(--verified-blue);
+            font-size: 24px;
+            display: none; /* Controlled by JS */
+            filter: drop-shadow(0 0 8px rgba(52, 183, 241, 0.6));
+        }
+
+        .uid-subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            color: var(--blue-neon);
+            opacity: 0.7;
+            margin-top: 5px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Elite Label */
+        .elite-label {
+            display: none; /* Controlled by JS */
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 15px;
+            border-radius: 20px;
+            margin-top: 15px;
+            letter-spacing: 3px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* ==========================================================================
+           PROFILE BIO SECTION
+           ========================================================================== */
+        .details-container {
+            padding: 0 20px 40px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            border-radius: 24px;
+            padding: 25px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative top border for cards */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--blue-neon), transparent);
+            opacity: 0.5;
+        }
+
+        .section-heading {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-heading i { color: var(--gold-glow); }
+
+        .bio-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-main);
+            font-weight: 500;
+            white-space: pre-wrap; /* Preserves line breaks from settings */
+        }
+        
+        .no-data-text {
+            color: #54656f;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        /* ==========================================================================
+           SOCIAL MEDIA GRID
+           ========================================================================== */
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .social-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .social-btn:active { transform: scale(0.95); }
+
+        /* Icon Wrapper inside button */
+        .social-icon-wrapper {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* Specific Brand Styles */
+        .btn-ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .btn-yt { background: var(--yt-color); }
+        .btn-tg { background: var(--tg-color); }
+        .btn-wa { background: var(--wa-brand); }
+        .btn-x { background: #000; border: 1px solid #333; }
+        .btn-fb { background: var(--fb-color); }
+        .btn-snap { background: var(--snap-color); color: #000; }
+        .btn-snap .social-icon-wrapper { background: rgba(0,0,0,0.1); }
+
+        /* ==========================================================================
+           CUSTOM LINKS (WEBSITES & PHONES)
+           ========================================================================== */
+        .custom-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .custom-link-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--panel-light);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            padding: 16px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+        .custom-link-item:hover {
+            background: #1a2b3c;
+            border-color: var(--blue-neon);
+            transform: translateX(5px);
+        }
+
+        .custom-icon {
+            font-size: 20px;
+            width: 40px; height: 40px;
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--blue-neon);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .custom-phone .custom-icon { color: var(--success-green); background: rgba(0, 168, 132, 0.1); }
+
+        .custom-info { flex: 1; overflow: hidden; }
+        .custom-title { font-weight: 700; font-size: 15px; margin-bottom: 3px; }
+        .custom-url { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Orbitron', sans-serif;}
+
+        /* ==========================================================================
+           SMART AD CONTAINER: "ICECREAM FRAME"
+           (Placement: Below Profile Info, above Action Bar)
+           ========================================================================== */
+        .icecream-container {
+            background: rgba(11, 20, 26, 0.6);
+            border: 1px solid #2a3942;
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+            text-align: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* ==========================================================================
+           ACTION BUTTONS (FIXED AT BOTTOM)
+           ========================================================================== */
+        .action-bar {
+            position: fixed;
+            bottom: 60px; /* Shifted slightly to accommodate bottom ad */
+            left: 0; right: 0;
+            padding: 20px;
+            background: linear-gradient(0deg, rgba(3,6,8,1) 0%, rgba(3,6,8,0.8) 70%, transparent 100%);
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            z-index: 100;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+        }
+
+        .action-btn {
+            flex: 1;
+            max-width: 250px;
+            padding: 18px;
+            border-radius: 20px;
+            border: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-chat {
+            background: var(--success-green);
+            color: white;
+            box-shadow: 0 10px 25px rgba(0, 168, 132, 0.4);
+        }
+        .btn-chat:hover { background: #00c298; transform: translateY(-3px); }
+        .btn-chat:active { transform: scale(0.95); }
+
+        .btn-share {
+            background: var(--panel-light);
+            color: var(--blue-neon);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+        }
+        .btn-share:hover { background: rgba(0, 242, 255, 0.1); transform: translateY(-3px); }
+
+        /* Padding to prevent action bar overlapping content */
+        .bottom-spacer { height: 160px; } /* Increased to clear action bar and ad */
+        
+        /* Error Screen */
+        #error-screen {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        #error-screen i { font-size: 60px; color: var(--danger-red); margin-bottom: 20px; }
+        #error-screen h2 { font-family: 'Orbitron'; color: white; margin-bottom: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <div id="loader-screen">
+        <div class="diamond-loader"></div>
+        <div class="loader-text">Decrypting Identity...</div>
+    </div>
+
+    <div id="error-screen">
+        <i class="fas fa-user-slash"></i>
+        <h2>PROFILE NOT FOUND</h2>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">The user you are looking for does not exist or has been deleted.</p>
+        <button class="nav-btn" style="width: auto; padding: 0 25px; border-radius: 12px; font-family: 'Orbitron';" onclick="window.history.back()">
+            <i class="fas fa-arrow-left" style="margin-right: 10px;"></i> GO BACK
+        </button>
+    </div>
+
+    <div id="profile-wrapper">
+        
+        <header>
+            <div class="nav-btn" onclick="window.history.back()" title="Go Back">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <div class="nav-btn" onclick="copyProfileLink()" title="Copy Profile Link">
+                <i class="fas fa-link"></i>
+            </div>
+        </header>
+
+        <section class="hero-section">
+            <div class="avatar-engine">
+                <div class="standard-ring"></div>
+                <div class="vip-ring" id="ui-vip-ring"></div>
+                <img id="ui-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="avatar-img" alt="Profile Avatar">
+            </div>
+
+            <div class="identity-box">
+                <h1 class="username-title">
+                    <span id="ui-username">Loading...</span>
+                    <i class="fas fa-check-circle vip-badge-icon" id="ui-verified-tick"></i>
+                </h1>
+                <div class="uid-subtitle" id="ui-uid">SYSTEM_ID: SCANNING...</div>
+                <div class="elite-label" id="ui-elite-badge">ELITE MEMBER</div>
+            </div>
+        </section>
+
+        <section class="details-container">
+            
+            <div class="glass-card">
+                <div class="section-heading"><i class="fas fa-quote-left"></i> ABOUT ME</div>
+                <div class="bio-text" id="ui-bio">Fetching encrypted bio...</div>
+            </div>
+
+            <div class="glass-card" id="socials-container" style="display: none;">
+                <div class="section-heading"><i class="fas fa-hashtag"></i> SOCIAL CONNECTIONS</div>
+                <div class="social-grid" id="ui-social-grid">
+                    </div>
+            </div>
+
+            <div class="glass-card" id="custom-links-container" style="display: none;">
+                <div class="section-heading"><i class="fas fa-globe"></i> EXTERNAL LINKS</div>
+                <div class="custom-links-list" id="ui-custom-links">
+                    </div>
+            </div>
+
+            <div class="icecream-container">
+                <p style="font-size: 11px; color: var(--gold-shine); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Sponsor Showcase</p>
+                <script async="async" data-cfasync="false" src="https://pl29315167.profitablecpmratenetwork.com/75ae8e7d50bf72473bf483baadd4bd3d/invoke.js"></script>
+                <div id="container-75ae8e7d50bf72473bf483baadd4bd3d"></div>
+            </div>
+            <div class="bottom-spacer"></div>
+        </section>
+
+        <div class="action-bar">
+            <button class="action-btn btn-share" onclick="shareProfile()">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+            <button class="action-btn btn-chat" id="chat-action-btn">
+                <i class="fas fa-paper-plane"></i> Message
+            </button>
+        </div>
+
+    </div>
+
+    <div style="position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; background: #0b141a; padding: 5px 0; border-top: 1px solid #202c33; z-index: 90;">
+        <script>
+          atOptions = {
+            'key' : 'ddcdc49a598e8289aae0ec213ca78dfa',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
+        </script>
+        <script src="https://www.highperformanceformat.com/ddcdc49a598e8289aae0ec213ca78dfa/invoke.js"></script>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // ==========================================================================
+        // FIREBASE INITIALIZATION
+        // ==========================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYX1lrxHre2bYKzZfOMM3WWwIKHPySI9I",
+            authDomain: "chat-81c0c.firebaseapp.com",
+            databaseURL: "https://chat-81c0c-default-rtdb.firebaseio.com",
+            projectId: "chat-81c0c",
+            appId: "1:852591586864:web:db877a72adbb742d5287f5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // ==========================================================================
+        // URL PARSER (GETTING TARGET USER)
+        // ==========================================================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUsername = urlParams.get('user'); // Extract ?user=username
+        
+        let myUID = null;
+        let myUsername = null;
+
+        // ==========================================================================
+        // AUTHENTICATION CHECK
+        // ==========================================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                myUID = user.uid;
+                const snap = await get(ref(db, 'userMapping/' + myUID));
+                if (snap.exists()) {
+                    myUsername = snap.val();
+                    // Proceed to load target profile
+                    loadTargetProfile();
+                } else {
+                    // Security fallback
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // ==========================================================================
+        // CORE FUNCTION: LOAD TARGET USER DATA
+        // ==========================================================================
+        async function loadTargetProfile() {
+            if (!targetUsername) {
+                showError();
+                return;
+            }
+
+            try {
+                // 1. Fetch main user profile data
+                const userSnap = await get(ref(db, `users/${targetUsername.toLowerCase()}`));
+                
+                if (!userSnap.exists()) {
+                    showError();
+                    return;
+                }
+
+                const userData = userSnap.val();
+                const targetUID = userData.uid;
+
+                // 2. Fetch VIP Membership Status from users_meta
+                const metaSnap = await get(ref(db, `users_meta/${targetUID}/membership`));
+                let isVIP = false;
+                
+                if (metaSnap.exists()) {
+                    const membership = metaSnap.val();
+                    if (membership.active === true) {
+                        // Check expiry if it exists
+                        if (!membership.expiry || Date.now() < membership.expiry) {
+                            isVIP = true;
+                        }
+                    }
+                }
+
+                // 3. Render Data to UI
+                renderUI(targetUsername, targetUID, userData, isVIP);
+
+                // 4. Setup Chat Action
+                document.getElementById('chat-action-btn').onclick = () => {
+                    // Directing back to index.html but we can pass the intent in URL
+                    // So index.html can automatically open chat with this user
+                    window.location.href = `index.html?chat=${encodeURIComponent(targetUsername)}`;
+                };
+
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+                showError();
+            }
+        }
+
+        // ==========================================================================
+        // RENDER UI ELEMENTS
+        // ==========================================================================
+        function renderUI(username, uid, data, isVIP) {
+            // Hide Loader, Show Content
+            document.getElementById('loader-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loader-screen').style.display = 'none';
+                document.getElementById('profile-wrapper').style.display = 'flex';
+            }, 500);
+
+            // --- Basic Info ---
+            document.getElementById('ui-username').innerText = username;
+            document.getElementById('ui-uid').innerText = `ID: ${uid.substring(0, 12).toUpperCase()}`;
+            
+            // Avatar (Use ui-avatars as fallback)
+            const defaultAvatar = `https://ui-avatars.com/api/?name=${username}&background=0d161d&color=ffd700&bold=true&size=200`;
+            document.getElementById('ui-avatar').src = data.profilePic || defaultAvatar;
+
+            // --- VIP / ELITE Formatting ---
+            if (isVIP) {
+                document.getElementById('ui-vip-ring').style.display = 'block';
+                document.getElementById('ui-verified-tick').style.display = 'inline-block';
+                document.getElementById('ui-elite-badge').style.display = 'inline-block';
+                document.getElementById('ui-avatar').style.borderColor = 'var(--panel-hex)';
+            }
+
+            // --- Profile Bio ---
+            const bioText = data.bio && data.bio.trim() !== "" ? data.bio : "Available. Exploring the ACANZA ecosystem.";
+            document.getElementById('ui-bio').innerText = bioText;
+
+            // --- Social Links (Instagram, YouTube, etc.) ---
+            const socialGrid = document.getElementById('ui-social-grid');
+            socialGrid.innerHTML = ''; // Clear empty
+            let hasSocials = false;
+
+            if (data.socials) {
+                const s = data.socials;
+                
+                // Helper to create social buttons
+                const createSocialBtn = (platform, iconClass, bgClass, label, link) => {
+                    hasSocials = true;
+                    return `
+                        <a href="${link}" target="_blank" class="social-btn ${bgClass}">
+                            <div class="social-icon-wrapper"><i class="${iconClass}"></i></div>
+                            ${label}
+                        </a>
+                    `;
+                };
+
+                if(s.instagram) socialGrid.innerHTML += createSocialBtn('instagram', 'fab fa-instagram', 'btn-ig', 'Instagram', `https://instagram.com/${s.instagram}`);
+                if(s.youtube) {
+                    let ytLink = s.youtube.includes('http') ? s.youtube : `https://youtube.com/@${s.youtube}`;
+                    socialGrid.innerHTML += createSocialBtn('youtube', 'fab fa-youtube', 'btn-yt', 'YouTube', ytLink);
+                }
+                if(s.x) socialGrid.innerHTML += createSocialBtn('x', 'fa-brands fa-x-twitter', 'btn-x', 'X (Twitter)', `https://x.com/${s.x}`);
+                if(s.facebook) socialGrid.innerHTML += createSocialBtn('facebook', 'fab fa-facebook-f', 'btn-fb', 'Facebook', `https://facebook.com/${s.facebook}`);
+                if(s.snapchat) socialGrid.innerHTML += createSocialBtn('snapchat', 'fab fa-snapchat-ghost', 'btn-snap', 'Snapchat', `https://snapchat.com/add/${s.snapchat}`);
+                if(s.telegram) socialGrid.innerHTML += createSocialBtn('telegram', 'fab fa-telegram-plane', 'btn-tg', 'Telegram', `https://t.me/${s.telegram}`);
+                if(s.whatsapp) socialGrid.innerHTML += createSocialBtn('whatsapp', 'fab fa-whatsapp', 'btn-wa', 'WhatsApp', `https://wa.me/${s.whatsapp}`);
+            }
+
+            if (hasSocials) {
+                document.getElementById('socials-container').style.display = 'block';
+            }
+
+            // --- Custom External Links (Website, Second Phone, etc.) ---
+            const customList = document.getElementById('ui-custom-links');
+            customList.innerHTML = ''; // Clear empty
+            let hasCustomLinks = false;
+
+            if (data.customLinks) {
+                Object.values(data.customLinks).forEach(link => {
+                    hasCustomLinks = true;
+                    
+                    let isNumber = /^[\+\d\s]+$/.test(link.url.trim());
+                    let iconClass = isNumber ? 'fas fa-phone-alt' : 'fas fa-globe';
+                    let itemClass = isNumber ? 'custom-phone' : 'custom-web';
+                    
+                    let finalUrl = link.url;
+                    if (isNumber) {
+                        finalUrl = 'tel:' + finalUrl.replace(/\s+/g, '');
+                    } else if (!finalUrl.startsWith('http') && !finalUrl.startsWith('mailto:') && !finalUrl.startsWith('tel:')) {
+                        finalUrl = 'https://' + finalUrl;
+                    }
+
+                    // Display URL beautifully (remove https:// for cleaner look)
+                    let displayUrl = link.url.replace(/^https?:\/\//, '');
+
+                    customList.innerHTML += `
+                        <a href="${finalUrl}" target="_blank" class="custom-link-item ${itemClass}">
+                            <div class="custom-icon"><i class="${iconClass}"></i></div>
+                            <div class="custom-info">
+                                <div class="custom-title">${link.title}</div>
+                                <div class="custom-url">${displayUrl}</div>
+                            </div>
+                            <i class="fas fa-external-link-alt" style="color:var(--text-muted); font-size:12px;"></i>
+                        </a>
+                    `;
+                });
+            }
+
+            if (hasCustomLinks) {
+                document.getElementById('custom-links-container').style.display = 'block';
+            }
+        }
+
+        // ==========================================================================
+        // ERROR HANDLER
+        // ==========================================================================
+        function showError() {
+            document.getElementById('loader-screen').style.display = 'none';
+            document.getElementById('profile-wrapper').style.display = 'none';
+            document.getElementById('error-screen').style.display = 'flex';
+        }
+
+        // ==========================================================================
+        // GLOBAL FUNCTIONS FOR BUTTONS
+        // ==========================================================================
+        window.copyProfileLink = function() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert("Profile Link Copied to Clipboard!");
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        };
+
+        window.shareProfile = function() {
+            if (navigator.share) {
+                navigator.share({
+                    title: `${targetUsername}'s ACANZA Profile`,
+                    text: `Check out ${targetUsername}'s secure profile on ACANZA.`,
+                    url: window.location.href,
+                }).catch((error) => console.log('Error sharing', error));
+            } else {
+                window.copyProfileLink(); // Fallback for browsers that don't support native share
+            }
+        };
+
+    </script>
+    
+    <script src="https://pl29315166.profitablecpmratenetwork.com/ba/84/b0/ba84b0393de82651915a70c9b829ef30.js"></script>
+    </body>
+</html>

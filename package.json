@@ -1,0 +1,9 @@
+{
+  "name": "acanza-backend-functions",
+  "version": "1.0.0",
+  "description": "FCM Push Notifications Backend for ACANZA",
+  "main": "sendPush.js",
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}

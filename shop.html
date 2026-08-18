@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ACANZA | Golden Shop & Elite Store</title>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- Razorpay Live API -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ==========================================================================
+           ACANZA GOLDEN SHOP - MASTER CSS VARIABLES
+           ========================================================================== */
+        :root { 
+            --wa-dark: #0b141a; 
+            --wa-panel: #111b21;
+            --wa-card: #202c33;
+            --wa-card-hover: #2a3942;
+            --wa-text: #e9edef; 
+            --wa-secondary: #8696a0; 
+            --wa-green: #00a884;
+            --error: #ff3b30;
+            --blue-tick: #34b7f1;
+            
+            /* Premium Colors */
+            --gold-light: #ffea70;
+            --gold-base: #ffd700;
+            --gold-dark: #ccaa00;
+            --neon-blue: #00f2ff;
+            --neon-pink: #ff00ea;
+            --hacker-green: #00ff00;
+            --blood-red: #d32f2f;
+            --royal-purple: #9c27b0;
+            --diamond-cyan: #b9f2ff;
+            --fire-orange: #ff5722;
+
+            /* Free Basic Colors */
+            --basic-red: #ff4d4d;
+            --basic-green: #4dff4d;
+            --basic-blue: #4d4dff;
+            --basic-grey: #a0a0a0;
+            --basic-silver: #c0c0c0;
+            
+            /* Gradients */
+            --grad-gold: linear-gradient(135deg, var(--gold-light), var(--gold-base), var(--gold-dark));
+            --grad-rgb: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            --grad-fire: linear-gradient(0deg, #ff0000, #ff7f00, #ffff00);
+            --grad-elite: linear-gradient(135deg, #0b001a 0%, #30005a 50%, #6a0099 100%);
+        }
+
+        /* ==========================================================================
+           GLOBAL RESET & BASIC SETUP
+           ========================================================================== */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+        }
+        
+        body { 
+            background-color: var(--wa-dark); 
+            color: var(--wa-text); 
+            overflow-x: hidden; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--wa-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--wa-secondary); border-radius: 10px; }
+
+        /* ==========================================================================
+           MASTER LOADER & SYNC OVERLAY
+           ========================================================================== */
+        #master-loader { 
+            position: fixed; inset: 0; background: rgba(11, 20, 26, 0.98); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; 
+        }
+        
+        .gold-spinner { 
+            width: 60px; height: 60px; border: 4px solid rgba(255, 215, 0, 0.2); 
+            border-top: 4px solid var(--gold-base); border-radius: 50%; 
+            animation: spinFast 1s linear infinite, glowPulse 2s infinite alternate; 
+        }
+
+        @keyframes spinFast { 100% { transform: rotate(360deg); } }
+        @keyframes glowPulse { 0% { box-shadow: 0 0 10px rgba(255,215,0,0.2); } 100% { box-shadow: 0 0 25px rgba(255,215,0,0.6); } }
+
+        /* ==========================================================================
+           HEADER
+           ========================================================================== */
+        header { 
+            background: var(--wa-panel); padding: 15px 20px; display: flex; 
+            align-items: center; justify-content: space-between; position: sticky; 
+            top: 0; z-index: 100; border-bottom: 1px solid #2a3942; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn { font-size: 22px; color: var(--wa-text); text-decoration: none; cursor: pointer; transition: 0.2s; }
+        .back-btn:active { transform: scale(0.85); color: var(--gold-base); }
+        
+        .shop-title {
+            font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;
+            background: var(--grad-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .balance-badge {
+            background: rgba(255, 215, 0, 0.1); border: 1px solid var(--gold-dark);
+            padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold;
+            color: var(--gold-light); display: flex; align-items: center; gap: 6px;
+        }
+        
+        #elite-timer {
+            font-size: 10px; color: var(--wa-secondary); display: block; text-align: right;
+            margin-top: 2px;
+        }
+
+        /* ==========================================================================
+           LIVE PROFILE PREVIEW SECTION
+           ========================================================================== */
+        .preview-section {
+            background: radial-gradient(circle at center, #1a252c 0%, var(--wa-dark) 100%);
+            padding: 40px 20px; text-align: center; border-bottom: 2px solid var(--gold-dark);
+            position: relative; overflow: hidden;
+        }
+
+        .preview-section::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 60%);
+            animation: rotateBg 20s linear infinite;
+        }
+        @keyframes rotateBg { 100% { transform: rotate(360deg); } }
+
+        .preview-box {
+            position: relative; z-index: 2; display: inline-flex; flex-direction: column;
+            align-items: center; background: rgba(0,0,0,0.4); padding: 30px; border-radius: 30px;
+            border: 1px solid #2a3942; box-shadow: 0 15px 35px rgba(0,0,0,0.6); backdrop-filter: blur(10px); min-width: 280px;
+        }
+
+        .preview-title { font-size: 11px; color: var(--wa-secondary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+
+        .avatar-wrapper { position: relative; width: 120px; height: 120px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
+        .preview-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; z-index: 5; position: relative; background: #202c33; }
+
+        /* Rings */
+        .ring-base { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; z-index: 10; display: none; }
+        
+        /* Free Rings */
+        .ring-basic-blue.active { display: block; border: 3px solid var(--basic-blue); }
+        .ring-basic-red.active { display: block; border: 3px solid var(--basic-red); }
+
+        /* Premium Rings */
+        .ring-neon-blue.active { display: block; border: 3px solid var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue), inset 0 0 15px var(--neon-blue); }
+        .ring-double-gold.active { display: block; border: 4px double var(--gold-base); box-shadow: 0 0 20px rgba(255,215,0,0.4); }
+        .ring-diamond.active { display: block; border: 4px dashed var(--diamond-cyan); box-shadow: 0 0 25px rgba(185, 242, 255, 0.8); animation: spinFast 10s linear infinite; }
+        .ring-fire.active { display: block; border: 3px solid var(--fire-orange); animation: fireFlicker 1.5s infinite alternate; }
+        .ring-rgb-spin.active {
+            display: block; border: 4px solid transparent; background-image: linear-gradient(var(--wa-dark), var(--wa-dark)), var(--grad-rgb);
+            background-origin: border-box; background-clip: content-box, border-box; animation: spinFast 2s linear infinite;
+        }
+        @keyframes fireFlicker { 0% { box-shadow: 0 0 15px #ff0000, inset 0 0 15px #ff0000; border-color: #ff0000; } 50% { box-shadow: 0 0 25px #ffff00, inset 0 0 25px #ffff00; border-color: #ff7f00; } 100% { box-shadow: 0 0 15px #ff0000, inset 0 0 15px #ff0000; border-color: #ff0000; } }
+
+        /* Names */
+        .preview-name-container { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 24px; font-weight: bold; transition: 0.3s; }
+        
+        .name-default { color: var(--wa-text); }
+        /* Free Names */
+        .name-basicred { color: var(--basic-red); }
+        .name-basicgreen { color: var(--basic-green); }
+        .name-basicblue { color: var(--basic-blue); }
+        
+        /* Premium Names */
+        .name-gold { background: var(--grad-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .name-neon { color: var(--neon-blue); text-shadow: 0 0 10px rgba(0, 242, 255, 0.5); }
+        .name-hacker { color: var(--hacker-green); font-family: 'Courier New', Courier, monospace; letter-spacing: -1px; }
+        .name-blood { color: var(--blood-red); text-shadow: 2px 2px 5px rgba(211, 47, 47, 0.6); font-weight: 900; }
+        .name-purple { color: var(--royal-purple); text-shadow: 0 0 15px rgba(156, 39, 176, 0.8); }
+
+        /* Ticks */
+        .tick-icon { display: none; font-size: 20px; transition: 0.3s; }
+        
+        /* Free Ticks */
+        .tick-grey.active { display: inline-block; color: var(--basic-grey); }
+        .tick-silver.active { display: inline-block; color: var(--basic-silver); }
+
+        /* Premium Ticks */
+        .tick-blue.active { display: inline-block; color: var(--blue-tick); filter: drop-shadow(0 0 4px rgba(52, 183, 241, 0.4)); }
+        .tick-gold.active { display: inline-block; color: var(--gold-base); filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6)); }
+        .tick-diamond.active { display: inline-block; color: var(--diamond-cyan); filter: drop-shadow(0 0 10px rgba(185, 242, 255, 0.9)); }
+        .tick-fire.active { display: inline-block; color: var(--fire-orange); animation: fireFlicker 1s infinite; }
+        .tick-rgb.active { display: inline-block; animation: rgbTick 3s linear infinite; }
+        @keyframes rgbTick { 0% { color: #ff0000; filter: drop-shadow(0 0 8px #ff0000); } 33% { color: #00ff00; filter: drop-shadow(0 0 8px #00ff00); } 66% { color: #0000ff; filter: drop-shadow(0 0 8px #0000ff); } 100% { color: #ff0000; filter: drop-shadow(0 0 8px #ff0000); } }
+
+        .preview-status { font-size: 13px; color: var(--wa-secondary); margin-top: 5px; }
+
+        /* ==========================================================================
+           TAB SYSTEM & STORE LAYOUT
+           ========================================================================== */
+        .tabs-container {
+            display: flex; justify-content: center; background: var(--wa-panel);
+            padding: 10px; border-bottom: 1px solid #2a3942; position: sticky; top: 60px; z-index: 90;
+        }
+        .tab-btn {
+            flex: 1; max-width: 300px; padding: 12px; font-weight: bold; font-size: 14px;
+            background: transparent; color: var(--wa-secondary); border: none; border-bottom: 3px solid transparent;
+            cursor: pointer; transition: 0.3s;
+        }
+        .tab-btn.active { color: var(--gold-base); border-bottom: 3px solid var(--gold-base); }
+
+        .store-container { padding: 20px; max-width: 1000px; margin: 0 auto; display: none; animation: fadeIn 0.3s; }
+        .store-container.active-tab { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .category-title {
+            font-size: 18px; color: var(--wa-text); font-weight: bold; margin: 35px 0 15px 0;
+            padding-bottom: 10px; border-bottom: 1px solid #2a3942; display: flex; align-items: center; gap: 10px;
+        }
+        .category-title i { color: var(--gold-base); }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; }
+
+        /* ELITE BANNER */
+        .elite-banner {
+            background: var(--grad-elite); border-radius: 20px; padding: 25px; text-align: center;
+            border: 2px solid var(--royal-purple); box-shadow: 0 10px 30px rgba(148, 0, 211, 0.4); margin-bottom: 30px;
+            position: relative; overflow: hidden;
+        }
+        .elite-banner::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotateBg 15s linear infinite;
+        }
+        .elite-banner h2 { color: #fff; margin-bottom: 10px; letter-spacing: 1px; font-size: 22px; position: relative; z-index: 2; }
+        .elite-banner p { color: #e0e0e0; font-size: 14px; margin-bottom: 15px; position: relative; z-index: 2; }
+        .elite-btn {
+            background: var(--grad-gold); color: #000; border: none; padding: 12px 30px; border-radius: 30px;
+            font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(255,215,0,0.3);
+            position: relative; z-index: 2;
+        }
+        .elite-btn:active { transform: scale(0.95); }
+
+        /* ==========================================================================
+           PRODUCT CARDS
+           ========================================================================== */
+        .product-card {
+            background: var(--wa-card); border-radius: 16px; padding: 20px 15px; text-align: center;
+            border: 1px solid #2a3942; position: relative; transition: all 0.3s ease; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 220px;
+        }
+        .product-card:hover { transform: translateY(-5px); border-color: var(--gold-dark); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .product-card.owned { border-color: var(--wa-green); }
+        .product-card.equipped { border-color: var(--gold-base); background: rgba(255,215,0,0.05); box-shadow: inset 0 0 20px rgba(255,215,0,0.1); }
+
+        .product-icon-area { height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+        .product-title { font-size: 15px; font-weight: bold; margin-bottom: 5px; color: var(--wa-text); }
+        .product-desc { font-size: 11px; color: var(--wa-secondary); line-height: 1.3; margin-bottom: 15px; }
+
+        /* Action Buttons */
+        .action-btn { width: 100%; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-buy { background: var(--grad-gold); color: #000; box-shadow: 0 4px 10px rgba(255,215,0,0.2); }
+        .btn-free { background: #2a3942; color: #fff; border: 1px solid #3b4a54; }
+        .btn-free:hover { background: #3b4a54; }
+        .btn-equip { background: var(--wa-panel); color: var(--wa-text); border: 1px solid var(--wa-secondary); }
+        .btn-equip:hover { background: #2a3942; color: white; }
+        .btn-unequip { background: rgba(255, 59, 48, 0.1); color: var(--error); border: 1px solid rgba(255, 59, 48, 0.3); }
+        .btn-elite-equip { background: var(--royal-purple); color: white; box-shadow: 0 0 15px rgba(156, 39, 176, 0.6); border: 1px solid #d88aff; }
+        .btn-elite-equip:hover { background: #b02ae6; }
+
+        .premium-tag {
+            position: absolute; top: 12px; right: -25px; background: var(--error); color: white;
+            font-size: 9px; font-weight: bold; padding: 4px 30px; transform: rotate(45deg); z-index: 5;
+        }
+        .tag-rare { background: var(--primary); }
+        .tag-epic { background: var(--fire-orange); }
+        .tag-legend { background: var(--diamond-cyan); color: #000; }
+        .tag-free { background: var(--wa-green); }
+        .tag-elite-free { background: var(--royal-purple); box-shadow: 0 0 10px rgba(156,39,176,0.8); }
+
+        /* ==========================================================================
+           MODALS (CHECKOUT)
+           ========================================================================== */
+        .modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; 
+            align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px);
+        }
+        .modal-box { 
+            background: var(--wa-panel); width: 100%; max-width: 380px; padding: 30px; border-radius: 24px; 
+            text-align: center; border: 1px solid var(--gold-dark); box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 20px; color: var(--wa-secondary); cursor: pointer; }
+        .modal-icon { font-size: 45px; margin-bottom: 15px; color: var(--gold-base); }
+        .checkout-title { font-size: 22px; margin-bottom: 5px; color: white; }
+        .checkout-item-name { font-size: 14px; color: var(--wa-green); margin-bottom: 20px; font-weight: bold; }
+        .price-display { font-size: 35px; font-weight: 800; color: var(--gold-base); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        
+        /* Razorpay & Divider Styling */
+        .rzp-btn { background: #3399cc; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; font-size: 16px; box-shadow: 0 5px 15px rgba(51, 153, 204, 0.4); margin-bottom: 20px; transition: 0.3s; }
+        .rzp-btn:hover { background: #287a9e; box-shadow: 0 8px 20px rgba(51, 153, 204, 0.6); }
+        .divider-text { color: var(--wa-secondary); font-size: 11px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; text-align: center; }
+        .divider-text::before, .divider-text::after { content: ''; flex: 1; border-bottom: 1px solid #3b4a54; margin: 0 10px; }
+        
+        .qr-wrapper { background: white; padding: 15px; border-radius: 16px; display: inline-block; margin-bottom: 20px; }
+        .qr-wrapper img { width: 160px; height: 160px; display: block; }
+        .upi-btn { background: #6739B7; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 15px; }
+        .txn-input { width: 100%; background: #0b141a; border: 1px solid #3b4a54; border-radius: 12px; color: white; padding: 14px; text-align: center; margin-bottom: 20px; }
+        .submit-btn { background: var(--grad-gold); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; }
+        .secure-footer { margin-top: 30px; font-size: 11px; color: #54656f; }
+    </style>
+</head>
+<body>
+
+    <div id="master-loader">
+        <div class="gold-spinner"></div>
+        <p style="margin-top:25px; color:var(--gold-base); font-size:13px; font-weight:bold; letter-spacing: 2px;">LOADING SECURE SHOP...</p>
+    </div>
+
+    <header>
+        <div class="header-left">
+            <a class='back-btn' href='/settings'><i class="fas fa-arrow-left"></i></a>
+            <div class="shop-title"><i class="fas fa-crown"></i> GOLDEN SHOP</div>
+        </div>
+        <div>
+            <div class="balance-badge" title="Status">
+                <i class="fas fa-id-badge"></i> <span id="elite-status-text">Basic User</span>
+            </div>
+            <span id="elite-timer"></span>
+        </div>
+    </header>
+
+    <section class="preview-section">
+        <div class="preview-box" id="preview-box">
+            <div class="preview-title">Live Profile Preview</div>
+            
+            <div class="avatar-wrapper">
+                <div id="prev-ring-basicblue" class="ring-base ring-basic-blue"></div>
+                <div id="prev-ring-basicred" class="ring-base ring-basic-red"></div>
+                <div id="prev-ring-neon" class="ring-base ring-neon-blue"></div>
+                <div id="prev-ring-gold" class="ring-base ring-double-gold"></div>
+                <div id="prev-ring-rgb" class="ring-base ring-rgb-spin"></div>
+                <div id="prev-ring-diamond" class="ring-base ring-diamond"></div>
+                <div id="prev-ring-fire" class="ring-base ring-fire"></div>
+                
+                <img id="preview-avatar-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="preview-avatar" alt="Avatar">
+            </div>
+
+            <div class="preview-name-container" id="preview-name-box">
+                <span id="preview-username" class="name-default">@username</span>
+                
+                <i id="prev-tick-grey" class="fas fa-check-circle tick-icon tick-grey"></i>
+                <i id="prev-tick-silver" class="fas fa-check-circle tick-icon tick-silver"></i>
+                <i id="prev-tick-blue" class="fas fa-check-circle tick-icon tick-blue"></i>
+                <i id="prev-tick-gold" class="fas fa-check-circle tick-icon tick-gold"></i>
+                <i id="prev-tick-rgb" class="fas fa-certificate tick-icon tick-rgb"></i>
+                <i id="prev-tick-diamond" class="fas fa-gem tick-icon tick-diamond"></i>
+                <i id="prev-tick-fire" class="fas fa-fire tick-icon tick-fire"></i>
+            </div>
+            
+            <div class="preview-status" id="preview-bio">Select items below to preview</div>
+        </div>
+    </section>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" id="btn-tab-free" onclick="switchTab('tab-free')">🎁 FREE TIER</button>
+        <button class="tab-btn" id="btn-tab-premium" onclick="switchTab('tab-premium')">💎 PREMIUM & ELITE</button>
+    </div>
+
+    <div id="tab-free" class="store-container active-tab">
+        <p style="font-size: 12px; color: var(--wa-secondary); text-align: center; margin-bottom: 10px;">Equip these basic items instantly for free.</p>
+
+        <div class="category-title"><i class="fas fa-palette"></i> Free Colors</div>
+        <div class="product-grid">
+            <div class="product-card" id="card-name_basicred" onmouseenter="previewItem('name', 'basicred')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-free">FREE</div>
+                <div class="product-icon-area"><h2 class="name-basicred" style="font-size: 26px;">Aa</h2></div>
+                <div class="product-title">Classic Red</div>
+                <div class="product-desc">Basic red color for your username.</div>
+                <div id="action-name_basicred" class="action-container"></div>
+            </div>
+            <div class="product-card" id="card-name_basicgreen" onmouseenter="previewItem('name', 'basicgreen')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-free">FREE</div>
+                <div class="product-icon-area"><h2 class="name-basicgreen" style="font-size: 26px;">Aa</h2></div>
+                <div class="product-title">Basic Green</div>
+                <div class="product-desc">Simple green text color.</div>
+                <div id="action-name_basicgreen" class="action-container"></div>
+            </div>
+            <div class="product-card" id="card-name_basicblue" onmouseenter="previewItem('name', 'basicblue')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-free">FREE</div>
+                <div class="product-icon-area"><h2 class="name-basicblue" style="font-size: 26px;">Aa</h2></div>
+                <div class="product-title">Standard Blue</div>
+                <div class="product-desc">Normal blue name color.</div>
+                <div id="action-name_basicblue" class="action-container"></div>
+            </div>
+        </div>
+
+        <div class="category-title"><i class="fas fa-check"></i> Free Badges</div>
+        <div class="product-grid">
+            <div class="product-card" id="card-tick_grey" onmouseenter="previewItem('tick', 'grey')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-free">FREE</div>
+                <div class="product-icon-area"><i class="fas fa-check-circle" style="font-size: 40px; color: var(--basic-grey);"></i></div>
+                <div class="product-title">Grey Tick</div>
+                <div class="product-desc">Basic 4th copy verification tick.</div>
+                <div id="action-tick_grey" class="action-container"></div>
+            </div>
+            <div class="product-card" id="card-tick_silver" onmouseenter="previewItem('tick', 'silver')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-free">FREE</div>
+                <div class="product-icon-area"><i class="fas fa-check-circle" style="font-size: 40px; color: var(--basic-silver);"></i></div>
+                <div class="product-title">Silver Tick</div>
+                <div class="product-desc">Slightly shiny basic tick.</div>
+                <div id="action-tick_silver" class="action-container"></div>
+            </div>
+        </div>
+
+        <div class="category-title"><i class="fas fa-circle-notch"></i> Free Rings</div>
+        <div class="product-grid">
+            <div class="product-card" id="card-ring_basicblue" onmouseenter="previewItem('ring', 'basicblue')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-free">FREE</div>
+                <div class="product-icon-area" style="position:relative; width:60px; height:60px;">
+                    <div class="ring-basic-blue active" style="position:absolute; inset:0; border-radius:50%;"></div>
+                </div>
+                <div class="product-title">Solid Blue Ring</div>
+                <div class="product-desc">A simple blue outline.</div>
+                <div id="action-ring_basicblue" class="action-container"></div>
+            </div>
+            <div class="product-card" id="card-ring_basicred" onmouseenter="previewItem('ring', 'basicred')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-free">FREE</div>
+                <div class="product-icon-area" style="position:relative; width:60px; height:60px;">
+                    <div class="ring-basic-red active" style="position:absolute; inset:0; border-radius:50%;"></div>
+                </div>
+                <div class="product-title">Solid Red Ring</div>
+                <div class="product-desc">A basic red border.</div>
+                <div id="action-ring_basicred" class="action-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-premium" class="store-container">
+        
+        <div class="elite-banner" id="elite-banner-ui">
+            <h2>👑 ACANZA ELITE MEMBERSHIP</h2>
+            <p>Become an Elite user! Unlock ALL Premium items instantly for 1 month. No 12-hour waiting period. Get full access now.</p>
+            <button class="elite-btn" onclick="openCheckout('membership_elite', '1 Month Elite Membership', 99)">GET ELITE FOR ₹99 / MONTH</button>
+        </div>
+
+        <p style="font-size: 12px; color: var(--wa-secondary); text-align: center; margin-bottom: 10px;" id="premium-status-msg">Premium items require 12 hours processing unless you have ELITE.</p>
+
+        <div class="category-title"><i class="fas fa-check-double"></i> Premium Badges</div>
+        <div class="product-grid">
+            <div class="product-card premium-card" id="card-tick_blue" onmouseenter="previewItem('tick', 'blue')" onmouseleave="resetPreview()">
+                <div class="product-icon-area"><i class="fas fa-check-circle" style="font-size: 40px; color: var(--blue-tick); filter: drop-shadow(0 0 10px rgba(52,183,241,0.5));"></i></div>
+                <div class="product-title">Official Blue Tick</div>
+                <div class="product-desc">Standard verified badge. Classic look.</div>
+                <div id="action-tick_blue" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-tick_gold" onmouseenter="previewItem('tick', 'gold')" onmouseleave="resetPreview()">
+                <div class="product-icon-area"><i class="fas fa-check-circle" style="font-size: 40px; color: var(--gold-base); filter: drop-shadow(0 0 10px rgba(255,215,0,0.5));"></i></div>
+                <div class="product-title">Royal Gold Tick</div>
+                <div class="product-desc">Stand out with a premium golden badge.</div>
+                <div id="action-tick_gold" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-tick_diamond" onmouseenter="previewItem('tick', 'diamond')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-legend">EPIC</div>
+                <div class="product-icon-area"><i class="fas fa-gem tick-diamond active" style="font-size: 40px;"></i></div>
+                <div class="product-title">Diamond Crest</div>
+                <div class="product-desc">Extremely rare cyan glowing diamond badge.</div>
+                <div id="action-tick_diamond" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-tick_fire" onmouseenter="previewItem('tick', 'fire')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-epic">HOT</div>
+                <div class="product-icon-area"><i class="fas fa-fire tick-fire active" style="font-size: 45px;"></i></div>
+                <div class="product-title">Blazing Fire Tick</div>
+                <div class="product-desc">Animated burning flame verified badge.</div>
+                <div id="action-tick_fire" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-tick_rgb" onmouseenter="previewItem('tick', 'rgb')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-rare">MYTHIC</div>
+                <div class="product-icon-area"><i class="fas fa-certificate tick-rgb active" style="font-size: 45px;"></i></div>
+                <div class="product-title">RGB Matrix Tick</div>
+                <div class="product-desc">Animated color-changing badge. Ultimate flex.</div>
+                <div id="action-tick_rgb" class="action-container"></div>
+            </div>
+        </div>
+
+        <div class="category-title"><i class="fas fa-paint-brush"></i> Premium Names</div>
+        <div class="product-grid">
+            <div class="product-card premium-card" id="card-name_gold" onmouseenter="previewItem('name', 'gold')" onmouseleave="resetPreview()">
+                <div class="product-icon-area"><h2 class="name-gold" style="font-size: 26px;">Aa</h2></div>
+                <div class="product-title">Golden Gradient</div>
+                <div class="product-desc">Make your name shine in chats.</div>
+                <div id="action-name_gold" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-name_neon" onmouseenter="previewItem('name', 'neon')" onmouseleave="resetPreview()">
+                <div class="product-icon-area"><h2 class="name-neon" style="font-size: 26px;">Aa</h2></div>
+                <div class="product-title">Neon Glow</div>
+                <div class="product-desc">Bright cyan glowing letters.</div>
+                <div id="action-name_neon" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-name_hacker" onmouseenter="previewItem('name', 'hacker')" onmouseleave="resetPreview()">
+                <div class="product-icon-area"><h2 class="name-hacker" style="font-size: 26px;">Aa</h2></div>
+                <div class="product-title">Terminal Green</div>
+                <div class="product-desc">For the developers and coders.</div>
+                <div id="action-name_hacker" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-name_blood" onmouseenter="previewItem('name', 'blood')" onmouseleave="resetPreview()">
+                <div class="product-icon-area"><h2 class="name-blood" style="font-size: 26px;">Aa</h2></div>
+                <div class="product-title">Bloody Red</div>
+                <div class="product-desc">Dark and aggressive red aura.</div>
+                <div id="action-name_blood" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-name_purple" onmouseenter="previewItem('name', 'purple')" onmouseleave="resetPreview()">
+                <div class="product-icon-area"><h2 class="name-purple" style="font-size: 26px;">Aa</h2></div>
+                <div class="product-title">Royal Purple</div>
+                <div class="product-desc">Elegant purple glowing text.</div>
+                <div id="action-name_purple" class="action-container"></div>
+            </div>
+        </div>
+
+        <div class="category-title"><i class="fas fa-bullseye"></i> Premium Rings</div>
+        <div class="product-grid">
+            <div class="product-card premium-card" id="card-ring_neon" onmouseenter="previewItem('ring', 'neon')" onmouseleave="resetPreview()">
+                <div class="product-icon-area" style="position:relative; width: 60px; height: 60px;"><div class="ring-neon-blue active" style="position:absolute; inset:0;"></div></div>
+                <div class="product-title">Neon Pulse Ring</div>
+                <div class="product-desc">Glowing blue border for your DP.</div>
+                <div id="action-ring_neon" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-ring_gold" onmouseenter="previewItem('ring', 'gold')" onmouseleave="resetPreview()">
+                <div class="product-icon-area" style="position:relative; width: 60px; height: 60px;"><div class="ring-double-gold active" style="position:absolute; inset:0;"></div></div>
+                <div class="product-title">Royal Double Ring</div>
+                <div class="product-desc">Premium double golden border.</div>
+                <div id="action-ring_gold" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-ring_diamond" onmouseenter="previewItem('ring', 'diamond')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-legend">EPIC</div>
+                <div class="product-icon-area" style="position:relative; width: 60px; height: 60px;"><div class="ring-diamond active" style="position:absolute; inset:0;"></div></div>
+                <div class="product-title">Diamond Sparkle</div>
+                <div class="product-desc">Rotating dashed cyan diamond border.</div>
+                <div id="action-ring_diamond" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-ring_fire" onmouseenter="previewItem('ring', 'fire')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-epic">HOT</div>
+                <div class="product-icon-area" style="position:relative; width: 60px; height: 60px;"><div class="ring-fire active" style="position:absolute; inset:0;"></div></div>
+                <div class="product-title">Inferno Ring</div>
+                <div class="product-desc">Animated burning flame border.</div>
+                <div id="action-ring_fire" class="action-container"></div>
+            </div>
+            <div class="product-card premium-card" id="card-ring_rgb" onmouseenter="previewItem('ring', 'rgb')" onmouseleave="resetPreview()">
+                <div class="premium-tag tag-rare">MYTHIC</div>
+                <div class="product-icon-area" style="position:relative; width: 60px; height: 60px;"><div class="ring-rgb-spin active" style="position:absolute; inset:0;"></div></div>
+                <div class="product-title">RGB Orbit Ring</div>
+                <div class="product-desc">Animated spinning rainbow border.</div>
+                <div id="action-ring_rgb" class="action-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="checkout-modal" class="modal">
+        <div class="modal-box">
+            <i class="fas fa-times close-modal" onclick="closeAll()"></i>
+            <i class="fas fa-shopping-cart modal-icon"></i>
+            <h3 class="checkout-title">Secure Checkout</h3>
+            <p class="checkout-item-name" id="chk-item-name">Item Name</p>
+            <div class="price-display"><span>₹</span><span id="chk-price" style="color:var(--gold-base); font-size:40px;">0</span></div>
+            
+            <!-- NEW LIVE RAZORPAY GATEWAY -->
+            <button class="rzp-btn" id="rzp-checkout-btn" onclick="startRazorpayPayment()">
+                <i class="fas fa-bolt"></i> PAY INSTANTLY WITH RAZORPAY
+            </button>
+            
+            <div class="divider-text">OR PAY MANUALLY (SLOW)</div>
+            
+            <!-- OLD MANUAL GATEWAY (KEPT INTACT AS REQUESTED) -->
+            <p style="font-size: 12px; color: var(--wa-secondary); margin-bottom: 15px;">Pay using any UPI App (GPay, PhonePe, Paytm)</p>
+            <div class="qr-wrapper"><img id="chk-qr" src="" alt="UPI QR Code"></div>
+            <button class="upi-btn" id="chk-upi-link" onclick=""><i class="fas fa-qrcode"></i> OPEN UPI APP TO PAY</button>
+            <div class="txn-input-container">
+                <label>Verification Step: Enter Transaction ID / UTR</label>
+                <input type="number" id="txn-id-input" class="txn-input" placeholder="12-digit UTR No. (e.g. 30123...)">
+            </div>
+            <button class="submit-btn" id="chk-submit-btn" onclick="submitPurchase()">CONFIRM MANUAL PAYMENT</button>
+            <div class="secure-footer"><i class="fas fa-lock"></i> Secured by ACANZA Encrypted Network</div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYX1lrxHre2bYKzZfOMM3WWwIKHPySI9I",
+            authDomain: "chat-81c0c.firebaseapp.com",
+            databaseURL: "https://chat-81c0c-default-rtdb.firebaseio.com",
+            projectId: "chat-81c0c",
+            appId: "1:852591586864:web:db877a72adbb742d5287f5"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        
+        // --- RAZORPAY KEY ---
+        const RAZORPAY_KEY = "rzp_live_T3XuB57BqqsNzz";
+
+        // --- 2. ADMIN TELEGRAM DETAILS ---
+        const TG_BOT_TOKEN = "8756428689:AAGY1PWLcCGHbe2lGTHtov2dLbLgs7vdXBc"; 
+        const TG_CHAT_ID = "-1003945018845";
+        const ADMIN_UPI_ID = "7558720286@fam";
+        const ADMIN_NAME = "shohebsm";
+
+        // --- 3. STATE VARIABLES ---
+        let myUID = ""; let myUser = "";
+        let userInventory = {}; let activePerks = { tick: "", name: "", ring: "" }; 
+        
+        // Elite Logic Variables
+        let hasElite = false;
+        let eliteExpiryTime = 0;
+        
+        let currentCheckoutId = ""; let currentCheckoutName = ""; let currentCheckoutPrice = 0;
+
+        const freeProducts = [
+            'name_basicred', 'name_basicgreen', 'name_basicblue',
+            'tick_grey', 'tick_silver',
+            'ring_basicblue', 'ring_basicred'
+        ];
+
+        const premiumProducts = [
+            'tick_blue', 'tick_gold', 'tick_rgb', 'tick_diamond', 'tick_fire',
+            'name_gold', 'name_neon', 'name_hacker', 'name_blood', 'name_purple',
+            'ring_neon', 'ring_gold', 'ring_rgb', 'ring_diamond', 'ring_fire'
+        ];
+        
+        // Prices mapping
+        const prices = {
+            'tick_diamond': 50, 'tick_fire': 60, 'tick_rgb': 60,
+            'ring_diamond': 50, 'ring_fire': 60, 'ring_rgb': 60,
+        };
+
+        function getPrice(id) { return prices[id] || 40; } // Default 40 for premium
+
+        // --- 4. INITIALIZATION ---
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                myUID = user.uid;
+                try {
+                    const snap = await db.ref('userMapping/' + myUID).get();
+                    if (snap.exists()) {
+                        myUser = snap.val();
+                        document.getElementById('preview-username').innerText = "@" + myUser;
+                        await loadUserProfile();
+                        await loadShopData();
+                    } else { window.location.href = "index.html"; }
+                    setTimeout(() => {
+                        document.getElementById('master-loader').style.opacity = '0';
+                        setTimeout(() => document.getElementById('master-loader').style.display = 'none', 300);
+                    }, 500);
+                } catch(e) { alert("Network error. Please check your connection."); }
+            } else { window.location.href = "index.html"; }
+        });
+
+        // --- 5. TABS LOGIC ---
+        function switchTab(tabId) {
+            document.getElementById('tab-free').classList.remove('active-tab');
+            document.getElementById('tab-premium').classList.remove('active-tab');
+            document.getElementById('btn-tab-free').classList.remove('active');
+            document.getElementById('btn-tab-premium').classList.remove('active');
+
+            document.getElementById(tabId).classList.add('active-tab');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
+
+        async function loadUserProfile() {
+            const userSnap = await db.ref(`users/${myUser}`).get();
+            if(userSnap.exists()) {
+                const data = userSnap.val();
+                if(data.profilePic) document.getElementById('preview-avatar-img').src = data.profilePic;
+                else if(auth.currentUser.photoURL) document.getElementById('preview-avatar-img').src = auth.currentUser.photoURL;
+            }
+        }
+
+        // --- 6. LOAD SHOP DATA & ELITE AUTO-EXPIRE LOGIC ---
+        async function loadShopData() {
+            const invSnap = await db.ref(`users_meta/${myUID}/inventory`).get();
+            if(invSnap.exists()) { userInventory = invSnap.val(); } else { userInventory = {}; }
+            
+            const activeSnap = await db.ref(`users_meta/${myUID}/active_perks`).get();
+            if(activeSnap.exists()) { activePerks = activeSnap.val(); } else { activePerks = { tick: "", name: "", ring: "" }; }
+            
+            // ==========================================
+            // ELITE MEMBERSHIP LOGIC (Auto Expire System)
+            // ==========================================
+            let eliteData = userInventory['membership_elite'];
+            if(eliteData) {
+                if(eliteData === true) {
+                    // Legacy dev override
+                    hasElite = true;
+                } else if (typeof eliteData === 'number') {
+                    if(Date.now() < eliteData) {
+                        hasElite = true;
+                        eliteExpiryTime = eliteData;
+                    } else {
+                        hasElite = false;
+                        await db.ref(`users_meta/${myUID}/inventory/membership_elite`).remove();
+                        delete userInventory['membership_elite'];
+                    }
+                }
+            } else {
+                hasElite = false;
+            }
+
+            // AUTO-UNEQUIP Premium items if Elite Expired
+            let perksChanged = false;
+            for (let type in activePerks) {
+                let subType = activePerks[type];
+                if(subType) {
+                    let prodId = type + '_' + subType;
+                    let isFreeTier = freeProducts.includes(prodId);
+                    let isOwnedByPurchase = userInventory[prodId] === true;
+                    
+                    if(!isFreeTier && !isOwnedByPurchase && !hasElite) {
+                        await db.ref(`users_meta/${myUID}/active_perks/${type}`).remove();
+                        if(type === 'tick') await db.ref(`users_meta/${myUID}/membership/active`).set(false);
+                        activePerks[type] = "";
+                        perksChanged = true;
+                    }
+                }
+            }
+            if(perksChanged) {
+                alert("Your ELITE MEMBERSHIP has expired. Premium items have been automatically unequipped. Please renew to access them again!");
+            }
+
+            if(hasElite) {
+                document.getElementById('elite-status-text').innerText = "ELITE MEMBER";
+                document.getElementById('elite-status-text').style.color = "var(--royal-purple)";
+                document.getElementById('elite-banner-ui').style.display = "none";
+                document.getElementById('premium-status-msg').innerText = "You have ELITE ACCESS. All items below are unlocked instantly.";
+                
+                if(eliteExpiryTime > 0) {
+                    let daysLeft = Math.ceil((eliteExpiryTime - Date.now()) / (1000 * 60 * 60 * 24));
+                    document.getElementById('elite-timer').innerText = `${daysLeft} Days Left`;
+                }
+            } else {
+                document.getElementById('elite-status-text').innerText = "Basic User";
+                document.getElementById('elite-status-text').style.color = "var(--gold-light)";
+                document.getElementById('elite-banner-ui').style.display = "block";
+                document.getElementById('premium-status-msg').innerText = "Premium items require 12 hours processing unless you have ELITE.";
+                document.getElementById('elite-timer').innerText = "";
+            }
+
+            applyActivePerksToPreview(); 
+            freeProducts.forEach(prodId => { renderButton(prodId, true, true); });
+            premiumProducts.forEach(prodId => {
+                let isOwned = userInventory[prodId] === true || hasElite;
+                renderButton(prodId, false, isOwned);
+            });
+        }
+
+        function renderButton(prodId, isFree, isOwned) {
+            const card = document.getElementById(`card-${prodId}`);
+            const actionDiv = document.getElementById(`action-${prodId}`);
+            if(!card || !actionDiv) return;
+
+            const parts = prodId.split('_');
+            const type = parts[0]; 
+            const subType = parts[1]; 
+
+            let existingTag = card.querySelector('.premium-tag');
+            if(!isFree && hasElite && !userInventory[prodId]) {
+                if(existingTag) {
+                    existingTag.className = "premium-tag tag-elite-free";
+                    existingTag.innerText = "ELITE";
+                }
+            }
+
+            if(isOwned) {
+                if(activePerks[type] === subType) {
+                    card.classList.add('equipped'); card.classList.remove('owned');
+                    actionDiv.innerHTML = `<button class="action-btn btn-unequip" onclick="unequipItem('${type}')"><i class="fas fa-times"></i> UNEQUIP</button>`;
+                } else {
+                    card.classList.add('owned'); card.classList.remove('equipped');
+                    let btnClass = isFree ? "btn-free" : (hasElite && !userInventory[prodId] ? "btn-elite-equip" : "btn-equip");
+                    let btnText = isFree ? "EQUIP FREE" : (hasElite && !userInventory[prodId] ? "EQUIP (FREE ELITE)" : "EQUIP ITEM");
+                    actionDiv.innerHTML = `<button class="action-btn ${btnClass}" onclick="equipItem('${type}', '${subType}')"><i class="fas fa-check"></i> ${btnText}</button>`;
+                }
+            } else {
+                card.classList.remove('owned'); card.classList.remove('equipped');
+                let price = getPrice(prodId);
+                let title = document.querySelector(`#card-${prodId} .product-title`).innerText;
+                actionDiv.innerHTML = `<button class="action-btn btn-buy" onclick="openCheckout('${prodId}', '${title}', ${price})">BUY FOR ₹${price}</button>`;
+            }
+        }
+
+        // --- 7. LIVE PREVIEW ---
+        function previewItem(type, subType) {
+            if(type === 'tick') {
+                document.querySelectorAll('.tick-icon').forEach(el => el.classList.remove('active'));
+                const el = document.getElementById(`prev-tick-${subType}`); if(el) el.classList.add('active');
+            } else if (type === 'name') {
+                const nameBox = document.getElementById('preview-username'); nameBox.className = ''; nameBox.classList.add(`name-${subType}`);
+            } else if (type === 'ring') {
+                document.querySelectorAll('.ring-base').forEach(el => el.classList.remove('active'));
+                const el = document.getElementById(`prev-ring-${subType}`); if(el) el.classList.add('active');
+            }
+        }
+
+        function resetPreview() { applyActivePerksToPreview(); }
+
+        function applyActivePerksToPreview() {
+            document.querySelectorAll('.tick-icon').forEach(el => el.classList.remove('active'));
+            document.getElementById('preview-username').className = 'name-default';
+            document.querySelectorAll('.ring-base').forEach(el => el.classList.remove('active'));
+            if(activePerks.tick) { const el = document.getElementById(`prev-tick-${activePerks.tick}`); if(el) el.classList.add('active'); }
+            if(activePerks.name) { document.getElementById('preview-username').classList.remove('name-default'); document.getElementById('preview-username').classList.add(`name-${activePerks.name}`); }
+            if(activePerks.ring) { const el = document.getElementById(`prev-ring-${activePerks.ring}`); if(el) el.classList.add('active'); }
+        }
+
+        // --- 8. EQUIP / UNEQUIP LOGIC (INSTANT) ---
+        async function equipItem(type, subType) {
+            try {
+                await db.ref(`users_meta/${myUID}/active_perks/${type}`).set(subType);
+                if(type === 'tick') { await db.ref(`users_meta/${myUID}/membership`).update({ active: true, type: subType }); }
+                await loadShopData();
+            } catch(e) { alert("Failed to equip item."); }
+        }
+
+        async function unequipItem(type) {
+            try {
+                await db.ref(`users_meta/${myUID}/active_perks/${type}`).remove();
+                if(type === 'tick') { await db.ref(`users_meta/${myUID}/membership/active`).set(false); }
+                activePerks[type] = ""; await loadShopData();
+            } catch(e) { alert("Failed to unequip item."); }
+        }
+
+        // --- 9. NEW: RAZORPAY INSTANT PAYMENT INTEGRATION ---
+        function startRazorpayPayment() {
+            var options = {
+                "key": RAZORPAY_KEY, 
+                "amount": currentCheckoutPrice * 100, // Razorpay takes amount in paise
+                "currency": "INR",
+                "name": "S-PROJECTS / S-GAMES", // Developer Branding Applied here!
+                "description": currentCheckoutName,
+                "image": "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+                "handler": async function (response) {
+                    // Success Handler
+                    await processInstantPurchase(response.razorpay_payment_id);
+                },
+                "prefill": {
+                    "name": myUser || "Acanza User",
+                    "email": "contact@s-projects.in",
+                    "contact": "9999999999" // Can be changed if you store user numbers
+                },
+                "theme": {
+                    "color": "#ffd700"
+                }
+            };
+            
+            var rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response){
+                alert("Payment Failed! Reason: " + response.error.description);
+            });
+            rzp.open();
+        }
+
+        async function processInstantPurchase(paymentId) {
+            const btn = document.getElementById('rzp-checkout-btn');
+            btn.innerText = "PROCESSING INSTANT DELIVERY...";
+            btn.disabled = true;
+
+            const now = new Date(); 
+            const dateStr = now.toLocaleDateString('en-IN'); 
+            const timeStr = now.toLocaleTimeString('en-IN'); 
+
+            const tgMessage = `✅ <b>NEW AUTOMATED ORDER (SUCCESS)</b>\n━━━━━━━━━━━━━━━━\n👤 <b>User:</b> @${myUser}\n🆔 <b>UID:</b> <code>${myUID}</code>\n🛒 <b>Item:</b> ${currentCheckoutName} (${currentCheckoutId})\n💰 <b>Price:</b> ₹${currentCheckoutPrice}\n💳 <b>Gateway:</b> Razorpay\n🔢 <b>Pay ID:</b> <code>${paymentId}</code>\n📅 <b>Date:</b> ${dateStr}\n⏰ <b>Time:</b> ${timeStr}\n━━━━━━━━━━━━━━━━\n<b>Status:</b> Instantly approved & delivered!`;
+
+            try {
+                // 1. Record successful payment in Firebase
+                const dbPaymentId = myUID + "_rzp_" + Date.now();
+                await db.ref(`admin_payments/${dbPaymentId}`).set({
+                    user: myUser, uid: myUID, itemId: currentCheckoutId, itemName: currentCheckoutName,
+                    price: currentCheckoutPrice, txnId: paymentId, status: 'success', 
+                    date: dateStr, time: timeStr, timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // 2. AUTOMATICALLY GRANT THE ITEM (No 12 hour wait!)
+                if (currentCheckoutId === 'membership_elite') {
+                    const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+                    await db.ref(`users_meta/${myUID}/inventory/membership_elite`).set(Date.now() + thirtyDays);
+                } else {
+                    await db.ref(`users_meta/${myUID}/inventory/${currentCheckoutId}`).set(true);
+                }
+
+                // 3. Send Success Notification to Telegram Bot
+                fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TG_CHAT_ID, text: tgMessage, parse_mode: 'HTML' })
+                }).catch(e => console.log("Telegram msg bypassed."));
+
+                // 4. Update UI
+                alert("🎉 Payment Successful! Item has been instantly added to your inventory.");
+                await loadShopData(); 
+                closeAll();
+                
+            } catch(e) { 
+                console.error("Firebase Sync Error:", e);
+                alert("Payment successful but syncing failed. Pls contact admin with Pay ID: " + paymentId); 
+            }
+
+            btn.innerHTML = '<i class="fas fa-bolt"></i> PAY INSTANTLY WITH RAZORPAY';
+            btn.disabled = false;
+        }
+
+        // --- 10. OLD MANUAL CHECKOUT LOGIC (KEPT INTACT AS FAILOVER) ---
+        async function submitPurchase() {
+            const txn = document.getElementById('txn-id-input').value.trim();
+            const btn = document.getElementById('chk-submit-btn');
+            if(txn.length !== 12) return alert("Bhai, valid 12-digit UTR/Transaction ID enter karo!");
+
+            btn.innerText = "VERIFYING & PROCESSING..."; 
+            btn.disabled = true;
+            
+            const now = new Date(); 
+            const dateStr = now.toLocaleDateString('en-IN'); 
+            const timeStr = now.toLocaleTimeString('en-IN'); 
+            
+            let adminActionMsg = `Add <code>${currentCheckoutId}</code> to inventory manually.`;
+            if(currentCheckoutId === 'membership_elite') {
+                adminActionMsg = `Set <code>membership_elite</code> value to a 30-day TIMESTAMP for 1 Month access.`;
+            }
+
+            const tgMessage = `🛍 <b>NEW MANUAL ORDER</b>\n━━━━━━━━━━━━━━━━\n👤 <b>User:</b> @${myUser}\n🆔 <b>UID:</b> <code>${myUID}</code>\n🛒 <b>Item:</b> ${currentCheckoutName} (${currentCheckoutId})\n💰 <b>Price:</b> ₹${currentCheckoutPrice}\n🔢 <b>UTR/TXN:</b> <code>${txn}</code>\n📅 <b>Date:</b> ${dateStr}\n⏰ <b>Time:</b> ${timeStr}\n━━━━━━━━━━━━━━━━\n<b>Action:</b> ${adminActionMsg}`;
+
+            try {
+                const paymentId = myUID + "_" + Date.now();
+                await db.ref(`admin_payments/${paymentId}`).set({
+                    user: myUser, uid: myUID, itemId: currentCheckoutId, itemName: currentCheckoutName,
+                    price: currentCheckoutPrice, txnId: txn, status: 'pending', 
+                    date: dateStr, time: timeStr, timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TG_CHAT_ID, text: tgMessage, parse_mode: 'HTML' })
+                }).catch(e => console.log("Telegram CORS ignored. Message already sent."));
+
+                alert("Your payment is verifying wait 12 or 24 hour.\n\nAgar aapko aapka gift nahin mila to aap support section Mein jakar appeal kar sakte hain aapko refund mil jaega.");
+                closeAll();
+                
+            } catch(e) { 
+                console.error("Firebase Sync Error:", e);
+                alert("Network error. Please try again."); 
+            }
+
+            btn.innerText = "CONFIRM MANUAL PAYMENT"; 
+            btn.disabled = false;
+        }
+
+        function openCheckout(id, name, price) {
+            currentCheckoutId = id; currentCheckoutName = name; currentCheckoutPrice = price;
+            document.getElementById('chk-item-name').innerText = name; document.getElementById('chk-price').innerText = price;
+            document.getElementById('txn-id-input').value = ""; 
+
+            const upiString = `upi://pay?pa=${ADMIN_UPI_ID}&pn=${ADMIN_NAME}&am=${price}&cu=INR&tn=ACANZA_${id}`;
+            document.getElementById('chk-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+            document.getElementById('chk-upi-link').onclick = () => { window.location.href = upiString; };
+            document.getElementById('checkout-modal').style.display = 'flex';
+        }
+
+        function closeAll() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); resetPreview(); }
+        window.onclick = function(e) { if(e.target.classList.contains('modal')) closeAll(); }
+    </script>
+</body>
+</html>

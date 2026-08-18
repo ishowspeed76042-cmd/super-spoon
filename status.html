@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACANZA | Status System</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --wa-green: #00a884;
+            --wa-dark: #0b141a;
+            --wa-panel: #202c33;
+            --wa-text: #e9edef;
+            --wa-secondary: #8696a0;
+            --gradient: linear-gradient(45deg, #00a884, #25d366);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background-color: var(--wa-dark); 
+            color: var(--wa-text); 
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+        }
+
+        /* --- LOADER --- */
+        #app-loader {
+            position: fixed; inset: 0; background: var(--wa-dark);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.6s;
+        }
+        .loading-circle {
+            width: 40px; height: 40px; border: 3px solid var(--wa-panel);
+            border-top: 3px solid var(--wa-green); border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- HEADER --- */
+        header {
+            background: var(--wa-panel); padding: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 500;
+        }
+        .logo-text { color: var(--wa-green); font-size: 20px; font-weight: bold; }
+
+        /* --- STATUS LIST --- */
+        .status-section { padding: 15px 0; }
+        .section-title { padding-left: 15px; font-size: 13px; color: var(--wa-secondary); text-transform: uppercase; margin-bottom: 12px; }
+
+        .status-wrapper {
+            display: flex; overflow-x: auto; padding: 0 15px; gap: 15px;
+        }
+        .status-wrapper::-webkit-scrollbar { display: none; }
+
+        .status-card { display: flex; flex-direction: column; align-items: center; min-width: 75px; cursor: pointer; }
+        
+        .ring-outer {
+            width: 65px; height: 65px; border-radius: 50%; padding: 2px;
+            background: var(--gradient); display: flex; justify-content: center; align-items: center;
+        }
+        .ring-inner { 
+            width: 100%; height: 100%; border-radius: 50%; 
+            background: var(--wa-dark); border: 2px solid var(--wa-dark); overflow: hidden;
+        }
+        .status-thumb { width: 100%; height: 100%; object-fit: cover; }
+
+        .user-label {
+            margin-top: 8px; font-size: 12px; color: var(--wa-text);
+            max-width: 75px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        /* --- VIEWER --- */
+        #story-viewer {
+            display: none; position: fixed; inset: 0; background: #000; z-index: 2000;
+            flex-direction: column;
+        }
+        .viewer-header {
+            padding: 15px; display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            position: absolute; width: 100%; z-index: 10;
+        }
+        .close-viewer { font-size: 30px; color: #fff; cursor: pointer; }
+        .media-container { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .media-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        /* --- FAB --- */
+        .actions { position: fixed; bottom: 30px; right: 20px; }
+        .btn-fab {
+            width: 55px; height: 55px; border-radius: 50%; background: var(--wa-green);
+            display: flex; align-items: center; justify-content: center; color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-loader">
+        <div class="loading-circle"></div>
+        <p id="loader-text" style="color: var(--wa-secondary); font-size: 13px; margin-top: 15px;">Loading Stories...</p>
+    </div>
+
+    <header>
+        <div class="logo-text">ACANZA</div>
+        <div id="user-display" style="font-size: 12px; color: var(--wa-secondary);">@guest</div>
+    </header>
+
+    <main>
+        <section class="status-section">
+            <div class="section-title">Recent Status Updates</div>
+            <div class="status-wrapper" id="master-status-list">
+                <div class="status-card" id="add-status-btn">
+                    <div class="ring-outer" style="background: #333;">
+                        <div class="ring-inner" style="display: flex; align-items: center; justify-content: center; background: #222;">
+                            <span style="font-size: 24px; color: var(--wa-green);">+</span>
+                        </div>
+                    </div>
+                    <span class="user-label">My Status</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="actions">
+        <div class="btn-fab" onclick="triggerUpload()"><i class="fas fa-camera">📷</i></div>
+    </div>
+
+    <div id="story-viewer">
+        <div class="viewer-header">
+            <div style="color: white; font-weight: bold;" id="viewer-name">Username</div>
+            <span class="close-viewer" onclick="closeStory()">&times;</span>
+        </div>
+        <div class="media-container">
+            <img id="viewer-content" src="">
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            apiKey: "AIzaSyAYX1lrxHre2bYKzZfOMM3WWwIKHPySI9I",
+            authDomain: "chat-81c0c.firebaseapp.com",
+            databaseURL: "https://chat-81c0c-default-rtdb.firebaseio.com",
+            projectId: "chat-81c0c",
+            appId: "1:852591586864:web:db877a72adbb742d5287f5"
+        };
+        const IMGBB_KEY = "f4e8c093429f4a9ec2937aef8637484b"; 
+
+        firebase.initializeApp(CONFIG);
+        const AUTH = firebase.auth();
+        const DB = firebase.database();
+        let currentUser = "Anonymous";
+
+        // 1. Get Username from Mapping
+        AUTH.onAuthStateChanged(async (user) => {
+            if (user) {
+                const snap = await DB.ref('userMapping/' + user.uid).get();
+                if (snap.exists()) {
+                    currentUser = snap.val();
+                    document.getElementById('user-display').innerText = "@" + currentUser;
+                }
+                loadStatuses();
+            } else {
+                window.location.href = "index.html"; 
+            }
+        });
+
+        // 2. Upload Story Logic
+        async function triggerUpload() {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if(!file) return;
+
+                showLoader("Posting Status...");
+
+                const fd = new FormData();
+                fd.append("image", file);
+
+                try {
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+                    const data = await res.json();
+                    
+                    if(data.success) {
+                        // SAVE TO FIREBASE with Username
+                        await DB.ref('statuses').push({
+                            imgUrl: data.data.url,
+                            userName: currentUser,
+                            timestamp: Date.now()
+                        });
+                        hideLoader();
+                    }
+                } catch (err) {
+                    alert("Upload Failed!");
+                    hideLoader();
+                }
+            };
+            input.click();
+        }
+
+        // 3. Load Stories and show Username
+        function loadStatuses() {
+            DB.ref('statuses').orderByChild('timestamp').on('value', (snapshot) => {
+                const list = document.getElementById('master-status-list');
+                const addBtn = document.getElementById('add-status-btn');
+                list.innerHTML = "";
+                list.appendChild(addBtn);
+
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    const card = document.createElement('div');
+                    card.className = 'status-card';
+                    card.onclick = () => openStory(data);
+                    
+                    card.innerHTML = `
+                        <div class="ring-outer">
+                            <div class="ring-inner">
+                                <img class="status-thumb" src="${data.imgUrl}">
+                            </div>
+                        </div>
+                        <span class="user-label">${data.userName}</span>
+                    `;
+                    // Latest status should be after the add button
+                    list.insertBefore(card, list.children[1]);
+                });
+                hideLoader();
+            });
+        }
+
+        // 4. Viewer Logic
+        function openStory(data) {
+            document.getElementById('viewer-content').src = data.imgUrl;
+            document.getElementById('viewer-name').innerText = "@" + data.userName;
+            document.getElementById('story-viewer').style.display = 'flex';
+        }
+
+        function closeStory() {
+            document.getElementById('story-viewer').style.display = 'none';
+        }
+
+        function showLoader(msg) {
+            document.getElementById('loader-text').innerText = msg;
+            document.getElementById('app-loader').style.display = 'flex';
+            document.getElementById('app-loader').style.opacity = '1';
+        }
+
+        function hideLoader() {
+            document.getElementById('app-loader').style.opacity = '0';
+            setTimeout(() => document.getElementById('app-loader').style.display = 'none', 500);
+        }
+
+        document.getElementById('add-status-btn').onclick = triggerUpload;
+
+    </script>
+</body>
+</html>

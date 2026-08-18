@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ACANZA PRO | VIP Invite</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           CSS VARIABLES FOR PROFESSIONAL LOOK
+           ========================================= */
+        :root { 
+            --wa-bg: #0b141a; 
+            --wa-text: #e9edef; 
+            --wa-action: #00a884; 
+            --danger: #ff3b30; 
+            --panel-bg: #111b21; 
+            --header-bg: #202c33;
+            --gold-shine: #ffd700; 
+            --neon-blue: #00f2ff;
+        }
+
+        /* =========================================
+           GLOBAL RESET & TYPOGRAPHY
+           ========================================= */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        
+        body { 
+            background: var(--wa-bg); 
+            color: var(--wa-text); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+        }
+
+        /* =========================================
+           HEADER STYLES
+           ========================================= */
+        header { 
+            background: var(--header-bg); 
+            padding: 15px 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            border-bottom: 1px solid #1c262e; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+        
+        .header-title { 
+            font-size: 19px; 
+            font-weight: bold; 
+            color: #fff; 
+            letter-spacing: 1px; 
+        }
+
+        /* =========================================
+           MAIN CONTAINER & CARD STYLES
+           ========================================= */
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Aligns card to top for better scrolling */
+            padding: 20px;
+            overflow-y: auto; /* Ensures card and native ad scroll together in one view */
+        }
+
+        .invite-card {
+            background: var(--panel-bg);
+            border: 1px solid #2a3942;
+            border-radius: 20px;
+            padding: 40px 25px 20px 25px; /* Added some padding adjustment */
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0; /* Prevents card from shrinking */
+        }
+
+        /* Glowing background effect behind the card */
+        .invite-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0, 168, 132, 0.05) 0%, transparent 60%);
+            animation: pulseGlow 4s infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes pulseGlow { 
+            0% { transform: scale(0.9); opacity: 0.5; } 
+            100% { transform: scale(1.1); opacity: 1; } 
+        }
+
+        .invite-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 168, 132, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            border: 2px solid var(--wa-action);
+            box-shadow: 0 0 15px rgba(0, 168, 132, 0.4);
+        }
+
+        .icon-wrapper i {
+            font-size: 35px;
+            color: var(--wa-action);
+        }
+
+        .invite-card h2 {
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .invite-card p {
+            font-size: 14px;
+            color: #8696a0;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        /* =========================================
+           REFERRAL CODE DISPLAY BOX
+           ========================================= */
+        .code-display-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px dashed var(--gold-shine);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
+        }
+
+        .code-display-box span {
+            display: block;
+            font-size: 12px;
+            color: var(--gold-shine);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .code-display-box h1 {
+            font-size: 28px;
+            color: #fff;
+            letter-spacing: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* =========================================
+           LINK INPUT & BUTTONS
+           ========================================= */
+        .link-container {
+            background: #0b141a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .link-container i {
+            color: #8696a0;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        #invite-link-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--wa-text);
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .copy-icon {
+            color: var(--wa-action);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 5px;
+            transition: 0.2s;
+        }
+
+        .copy-icon:active {
+            transform: scale(0.8);
+        }
+
+        .share-btn {
+            width: 100%;
+            background: var(--wa-action);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 168, 132, 0.4);
+            transition: 0.3s;
+            margin-bottom: 10px; /* Space from native ad container */
+        }
+
+        .share-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 168, 132, 0.4);
+        }
+
+        /* =========================================
+           SMART AD CONTAINER: "ICECREAM FRAME"
+           (Placement: INSIDE the card, unified view)
+           ========================================= */
+        .icecream-container {
+            background: rgba(11, 20, 26, 0.6);
+            border: 1px solid #2a3942;
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+            text-align: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* =========================================
+           TOAST NOTIFICATION
+           ========================================= */
+        #toast {
+            position: fixed; 
+            bottom: 90px; /* Positioned above the footer ad */
+            left: 50%; 
+            transform: translateX(-50%) translateY(100px);
+            background: #fff; 
+            color: #000; 
+            padding: 12px 25px; 
+            border-radius: 25px;
+            font-weight: bold; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+            z-index: 1000;
+        }
+        #toast.show { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; 
+        }
+
+        /* LOADING OVERLAY */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--wa-bg); z-index: 9999; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .spinner { 
+            border: 4px solid rgba(255, 255, 255, 0.1); 
+            border-left-color: var(--wa-action); 
+            border-radius: 50%; 
+            width: 40px; 
+            height: 40px; 
+            animation: spin 1s linear infinite; 
+            margin-bottom: 15px; 
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <b style="color:var(--wa-action); letter-spacing:1px;">GENERATING 10-DIGIT VIP CODE...</b>
+    </div>
+
+    <header>
+        <i class="fas fa-arrow-left" onclick="window.location.href='settings.html'" style="cursor:pointer; color: #fff; font-size: 20px;"></i>
+        <div class="header-title">Invite Friends</div>
+    </header>
+
+    <div class="container">
+        <div class="invite-card">
+            <div class="icon-wrapper">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+            <h2>Share ACANZA PRO</h2>
+            <p>Share your unique 10-character code. When friends join using it, you both get Elite Rewards!</p>
+            
+            <div class="code-display-box">
+                <span>Your Unique VIP Code</span>
+                <h1 id="display-ref-code">----------</h1>
+            </div>
+
+            <div class="link-container">
+                <i class="fas fa-link"></i>
+                <input type="text" id="invite-link-input" value="Fetching your link..." readonly>
+                <i class="fas fa-copy copy-icon" id="copy-btn" title="Copy Link"></i>
+            </div>
+
+            <button class="share-btn" id="share-btn">
+                <i class="fas fa-share-nodes"></i> SHARE VIP LINK
+            </button>
+
+            <div class="icecream-container">
+                <p style="font-size: 11px; color: var(--gold-shine); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Sponsor Showcase</p>
+                
+                <script async="async" data-cfasync="false" src="https://pl29315167.profitablecpmratenetwork.com/75ae8e7d50bf72473bf483baadd4bd3d/invoke.js"></script>
+                <div id="container-75ae8e7d50bf72473bf483baadd4bd3d"></div>
+            </div>
+            </div>
+    </div>
+
+    <div style="text-align: center; background: #0b141a; padding: 10px 0; border-top: 1px solid #202c33; flex-shrink:0;">
+        <script>
+          atOptions = {
+            'key' : 'ddcdc49a598e8289aae0ec213ca78dfa',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
+        </script>
+        <script src="https://www.highperformanceformat.com/ddcdc49a598e8289aae0ec213ca78dfa/invoke.js"></script>
+    </div>
+    <div id="toast">Link Copied!</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // =========================================
+        // FIREBASE CONFIGURATION (Copied from index)
+        // =========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYX1lrxHre2bYKzZfOMM3WWwIKHPySI9I",
+            authDomain: "chat-81c0c.firebaseapp.com",
+            databaseURL: "https://chat-81c0c-default-rtdb.firebaseio.com",
+            projectId: "chat-81c0c",
+            appId: "1:852591586864:web:db877a72adbb742d5287f5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentUser = null;
+        let currentUID = null;
+        let generatedCode = "";
+        let generatedLink = "";
+
+        // =========================================
+        // INITIALIZATION
+        // =========================================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUID = user.uid;
+                // Fetch Username from mapping
+                const snap = await get(ref(db, 'userMapping/' + currentUID));
+                if (snap.exists()) {
+                    currentUser = snap.val();
+                    await fetchOrGenerateCode();
+                } else {
+                    window.location.href = 'index.html'; // Fallback
+                }
+            } else {
+                window.location.href = 'index.html'; // Redirect to login if not logged in
+            }
+        });
+
+        // =========================================
+        // 10-CHARACTER RANDOM CODE GENERATOR LOGIC
+        // =========================================
+        function generate10CharReferralCode(username) {
+            // Take up to the first 4 characters of the username (if shorter, takes available)
+            let prefix = username.substring(0, 4).toUpperCase();
+            
+            // Calculate how many random characters are needed to make exactly 10
+            let randomLength = 10 - prefix.length;
+            let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let randomPart = '';
+            
+            for (let i = 0; i < randomLength; i++) {
+                randomPart += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            
+            return prefix + randomPart; // Exactly 10 characters guaranteed!
+        }
+
+        async function fetchOrGenerateCode() {
+            try {
+                // Check if user already has a generated code saved
+                const metaRef = ref(db, `users_meta/${currentUID}/my_referral_code`);
+                const codeSnap = await get(metaRef);
+
+                if (codeSnap.exists()) {
+                    generatedCode = codeSnap.val();
+                } else {
+                    // Generate new 10-char code
+                    generatedCode = generate10CharReferralCode(currentUser);
+                    
+                    // Save to user's profile
+                    await set(metaRef, generatedCode);
+                    
+                    // ========================================================
+                    // REFERRAL BANK: Save code here so index.html can verify it
+                    // ========================================================
+                    const bankFolderRef = ref(db, `Referral_Bank/${generatedCode}`);
+                    await set(bankFolderRef, {
+                        ownerUsername: currentUser,
+                        ownerUID: currentUID,
+                        createdAt: Date.now()
+                    });
+                }
+
+                // Setup UI
+                setupInviteLink(generatedCode);
+                
+            } catch (error) {
+                console.error("Error setting up referral code:", error);
+                alert("Network error fetching invite code.");
+            }
+        }
+
+        function setupInviteLink(code) {
+            document.getElementById('display-ref-code').innerText = code;
+            generatedLink = `https://about-me-shoheb.netlify.app/?ref=${code}`;
+            document.getElementById('invite-link-input').value = generatedLink;
+            setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
+        }
+
+        // =========================================
+        // UI INTERACTIONS
+        // =========================================
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        document.getElementById('copy-btn').onclick = () => {
+            const linkInput = document.getElementById('invite-link-input');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999); 
+            
+            navigator.clipboard.writeText(linkInput.value).then(() => {
+                showToast("Link Copied Successfully!");
+            }).catch(() => {
+                document.execCommand('copy');
+                showToast("Link Copied!");
+            });
+        };
+
+        document.getElementById('share-btn').onclick = async () => {
+            const shareData = {
+                title: 'ACANZA PRO | VIP Invite',
+                text: `Join me on ACANZA PRO! The most secure developer chat network. Use my VIP Referral Code (${generatedCode}) to instantly unlock 7 Days of Elite Membership:\n\n`,
+                url: generatedLink
+            };
+
+            if (navigator.share) {
+                try { await navigator.share(shareData); } catch (err) { console.log(err); }
+            } else {
+                document.getElementById('copy-btn').click();
+                alert("The link has been copied to your clipboard!");
+            }
+        };
+    </script>
+    
+    <script src="https://pl29315166.profitablecpmratenetwork.com/ba/84/b0/ba84b0393de82651915a70c9b829ef30.js"></script>
+    </body>
+</html>

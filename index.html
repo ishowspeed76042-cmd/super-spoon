@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ACANZA PRO | Secure Developer Edition</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+    <style>
+        /* =========================================
+           CSS VARIABLES FOR PROFESSIONAL LOOK
+           ========================================= */
+        :root { 
+            --wa-teal: #075e54; 
+            --wa-bg: #0b141a; 
+            --wa-sent: #056162; 
+            --wa-received: #202c33; 
+            --wa-text: #e9edef; 
+            --wa-action: #00a884; 
+            --danger: #ff3b30; 
+            --blue-tick: #34b7f1; 
+            --silver-tick: #c0c0c0;
+            --gold-shine: #ffd700; 
+            --panel-bg: #111b21;
+            --header-bg: #202c33;
+            --view-once-color: #00f2ff;
+        }
+
+        /* =========================================
+           GLOBAL RESET & BULLETPROOF MOBILE HEIGHT
+           ========================================= */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        
+        html, body {
+            height: 100%; 
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body { 
+            background: var(--wa-bg); 
+            color: var(--wa-text); 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        /* =========================================
+           CUSTOM SCROLLBAR (NEW UPDATE)
+           ========================================= */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--wa-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b4a54;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--wa-action);
+        }
+
+        /* =========================================
+           SCREEN MANAGEMENT & ANIMATIONS
+           ========================================= */
+        #auth-screen, 
+        #verification-screen,
+        #username-screen,
+        #referral-screen, 
+        #main-app, 
+        #chat-screen, 
+        #admin-panel,
+        #requests-screen,
+        #app-details-screen { 
+            display: none; 
+            height: 100%; 
+            width: 100%; 
+            flex-direction: column; 
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+
+        /* =========================================
+           VIP VERIFIED BADGE STYLE & ANIMATION
+           ========================================= */
+        .verified-badge {
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        /* VIP TICK COLOR CHANGING ANIMATION */
+        @keyframes vipTickCycle {
+            0% { color: var(--blue-tick); filter: drop-shadow(0 0 4px var(--blue-tick)); }
+            33% { color: var(--silver-tick); filter: drop-shadow(0 0 4px var(--silver-tick)); }
+            66% { color: var(--gold-shine); filter: drop-shadow(0 0 4px var(--gold-shine)); }
+            100% { color: var(--blue-tick); filter: drop-shadow(0 0 4px var(--blue-tick)); }
+        }
+
+        .verified-badge i { animation: vipTickCycle 4s infinite alternate ease-in-out; }
+
+        /* =========================================
+           VIP PROFILE PICTURE RING ANIMATION
+           ========================================= */
+        @keyframes spinRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes ringColorCycle {
+            0% { border-top-color: var(--blue-tick); border-bottom-color: var(--blue-tick); }
+            33% { border-top-color: var(--silver-tick); border-bottom-color: var(--silver-tick); }
+            66% { border-top-color: var(--gold-shine); border-bottom-color: var(--gold-shine); }
+            100% { border-top-color: var(--blue-tick); border-bottom-color: var(--blue-tick); }
+        }
+
+        .vip-ring { position: relative; z-index: 1; }
+        .vip-ring::before {
+            content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 50%; border: 2px solid transparent; border-left-color: transparent !important;
+            border-right-color: transparent !important; animation: spinRing 2.5s linear infinite, ringColorCycle 4s infinite alternate ease-in-out;
+            pointer-events: none; z-index: 10;
+        }
+
+        /* =========================================
+           VIP CHAT THEME
+           ========================================= */
+        .chat-body.vip-theme {
+            background: linear-gradient(135deg, #0b141a 0%, #062130 50%, #0b141a 100%) !important; box-shadow: inset 0 0 20px rgba(52, 183, 241, 0.05);
+        }
+        .chat-body.vip-theme .bubble.received {
+            background: rgba(32, 44, 51, 0.95); border-left: 2px solid var(--blue-tick); box-shadow: 0 2px 8px rgba(52, 183, 241, 0.15);
+        }
+
+        /* =========================================
+           AUTH SCREENS STYLES
+           ========================================= */
+        .card { 
+            background: var(--panel-bg); padding: 35px; border-radius: 20px; width: 90%; 
+            max-width: 420px; text-align: center; border: 1px solid #2a3942; margin: auto; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-height: 95vh; overflow-y: auto;
+        }
+        .card::-webkit-scrollbar { display: none; }
+        .card { -ms-overflow-style: none; scrollbar-width: none; }
+
+        input { 
+            width: 100%; padding: 15px; margin: 12px 0; background: #2a3942; 
+            border: 1px solid transparent; border-radius: 10px; color: white; outline: none; font-size: 16px; transition: 0.3s;
+        }
+        input:focus { border-color: var(--wa-action); }
+
+        .btn-wa { 
+            width: 100%; padding: 15px; background: var(--wa-action); border: none; 
+            border-radius: 10px; color: white; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; transition: 0.2s;
+        }
+        .btn-wa:active { transform: scale(0.98); }
+
+        .btn-google {
+            width: 100%; padding: 15px; background: white; border: none; border-radius: 10px;
+            color: #333; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .btn-google:active { transform: scale(0.98); }
+        .btn-google img { width: 20px; height: 20px; }
+
+        .divider { display: flex; align-items: center; text-align: center; margin: 20px 0; color: #8696a0; font-size: 14px; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #2a3942; }
+        .divider:not(:empty)::before { margin-right: .25em; }
+        .divider:not(:empty)::after { margin-left: .25em; }
+
+        .forget-link { display: block; margin-top: 12px; color: var(--wa-action); font-size: 13px; cursor: pointer; text-decoration: none; opacity: 0.8; transition: 0.3s; }
+        .forget-link:hover { opacity: 1; text-decoration: underline; }
+
+        /* =========================================
+           HEADER & NAVIGATION
+           ========================================= */
+        header { background: var(--header-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; z-index: 100; }
+
+        #dropdown-menu { 
+            display: none; position: absolute; right: 15px; top: 60px; background: #233138; 
+            border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); z-index: 1000; width: 280px; overflow: hidden; border: 1px solid #3b4a54;
+        }
+        .menu-item { padding: 14px 20px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #2a3942; color: white; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+        .menu-item:hover { background: #182229; }
+        .menu-dev { color: #00f2ff !important; font-weight: bold; }
+        .menu-admin-req { color: var(--gold-shine) !important; font-weight: bold; border-top: 1px solid #444; }
+
+        .menu-elite {
+            color: #d8b4fe !important; font-weight: 800; background: linear-gradient(90deg, rgba(168, 85, 247, 0.05), rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05));
+            border-bottom: 1px solid #2a3942; animation: pulsePurpleText 2s infinite alternate ease-in-out;
+        }
+        .menu-elite:hover { background: linear-gradient(90deg, rgba(168, 85, 247, 0.15), rgba(168, 85, 247, 0.3), rgba(168, 85, 247, 0.15)); }
+
+        @keyframes pulsePurpleText { 0% { text-shadow: 0 0 5px rgba(168, 85, 247, 0.5); color: #c084fc; } 100% { text-shadow: 0 0 20px rgba(168, 85, 247, 1); color: #e9d5ff; } }
+
+        /* APP TABS */
+        .app-tabs { display: flex; background: var(--header-bg); border-bottom: 1px solid #111b21; }
+        .tab-btn { flex: 1; text-align: center; padding: 14px; color: #8696a0; font-weight: bold; font-size: 14px; text-transform: uppercase; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .tab-btn:hover { color: #d1d7db; }
+        .tab-btn.active { color: var(--wa-action); border-bottom: 3px solid var(--wa-action); }
+
+        /* =========================================
+           LISTS & FRIENDS
+           ========================================= */
+        #friend-list, #admin-req-list, #req-list { flex: 1; overflow-y: auto; background: var(--wa-bg); }
+        .friend-item { padding: 15px 20px; border-bottom: 1px solid #222c33; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
+        .friend-item:active { background: #202c33; }
+        .friend-item.vip-friend-item { background: linear-gradient(90deg, rgba(11, 20, 26, 1) 0%, rgba(0, 191, 255, 0.12) 50%, rgba(11, 20, 26, 1) 100%); border-left: 4px solid var(--blue-tick); box-shadow: inset 0 0 15px rgba(52, 183, 241, 0.05); }
+        .avatar { width: 50px; height: 50px; background: #6a7175; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; position: relative; z-index: 2; }
+        .avatar i { position: relative; z-index: 2; }
+        .user-info { flex: 1; overflow: hidden; }
+        .user-info b { font-size: 17px; color: #e9edef; display: flex; align-items: center; transition: color 0.3s; }
+        .user-info p { font-size: 14px; color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .unread-badge { background: var(--wa-action); color: white; font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 50%; display: none; margin-left: auto; }
+        .req-action-btn { border: none; padding: 10px 14px; border-radius: 8px; color: white; cursor: pointer; font-size: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .req-accept { background: var(--wa-action); }
+        .req-decline { background: var(--danger); }
+
+        /* =========================================
+           CHAT STYLES
+           ========================================= */
+        .chat-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; background: #0b141a; position: relative; transition: background 0.5s ease; scroll-behavior: smooth; /* UPDATE: Smooth scrolling */ }
+        .chat-body.golden-theme { background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%) !important; }
+
+        .bubble { 
+            max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 15.5px; position: relative; 
+            word-wrap: break-word; box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: slideMsg 0.3s ease;
+            -webkit-user-select: none; /* Prevent text selection during long press */
+            user-select: none; 
+        }
+        @keyframes slideMsg { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .sent { align-self: flex-end; background: var(--wa-sent); border-top-right-radius: 2px; }
+        .received { align-self: flex-start; background: var(--wa-received); border-top-left-radius: 2px; transition: 0.3s ease; }
+        
+        .status-tick { font-size: 11px; margin-left: 8px; color: #8696a0; vertical-align: bottom; transition: color 0.3s ease; }
+        .status-tick.read { color: var(--blue-tick); }
+        .dev-badge { font-size: 10px; background: rgba(255, 215, 0, 0.15); color: var(--gold-shine); padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-bottom: 4px; display: inline-block; border: 1px solid var(--gold-shine); }
+        .edited-tag { font-size: 11px; font-style: italic; color: #8696a0; margin-left: 5px; }
+
+        /* =========================================
+           VIEW ONCE & CAPTION STYLES
+           ========================================= */
+        .locked-vo-bubble {
+            background: rgba(0, 242, 255, 0.1); border: 1px solid var(--view-once-color); color: var(--view-once-color);
+            padding: 12px 18px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 0 10px rgba(0, 242, 255, 0.15);
+        }
+        .caption-text { display: block; font-size: 14.5px; margin-top: 8px; color: white; word-wrap: break-word; }
+        
+        #media-preview-screen {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0b141a; z-index: 5000; flex-direction: column; animation: fadeIn 0.3s;
+        }
+        .preview-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--header-bg); }
+        .preview-content { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 20px; background: #000; }
+        .preview-content img, .preview-content video { max-width: 100%; max-height: 100%; border-radius: 10px; object-fit: contain; }
+        
+        .vo-btn {
+            width: 32px; height: 32px; border-radius: 50%; border: 2px solid #8696a0; color: #8696a0;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.3s;
+        }
+        .vo-btn.active { color: var(--view-once-color); border-color: var(--view-once-color); background: rgba(0,242,255,0.1); box-shadow: 0 0 10px rgba(0,242,255,0.3); }
+
+        /* ACTION SHEET FOR EDIT/DELETE */
+        #msg-action-sheet {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: var(--panel-bg);
+            z-index: 6000; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.6); flex-direction: column; animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .action-opt { padding: 16px; font-size: 16px; color: white; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid #2a3942; }
+        .action-opt:active { background: #182229; }
+
+        /* =========================================
+           FOOTER CONTROLS & NEW AUDIO RECORDER UI
+           ========================================= */
+        footer { padding: 12px 15px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); background: var(--header-bg); display: flex; align-items: center; gap: 12px; }
+        #msg-input { margin: 0; border-radius: 25px; flex: 1; background: #2a3942; padding: 12px 20px; color: white; border: none; outline: none; }
+        .action-icon { font-size: 22px; color: #8696a0; cursor: pointer; transition: 0.2s; }
+        .action-icon:hover { color: white; }
+
+        /* NEW BLINKING DOT CSS */
+        .blinking-dot {
+            width: 12px; height: 12px;
+            background-color: var(--danger);
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        /* Audio Player Styling Adjustment */
+        audio::-webkit-media-controls-panel {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        #selection-bar { display: none; background: var(--danger); padding: 15px 25px; justify-content: space-between; align-items: center; font-weight: bold; color: white; animation: fadeIn 0.3s ease; }
+        .select-cb { width: 20px; height: 20px; cursor: pointer; accent-color: var(--danger); }
+        .secure-3d { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        
+        .file-attachment { display: flex; align-items: center; background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 8px; margin-top: 5px; text-decoration: none; color: var(--wa-text); }
+        .file-attachment i { font-size: 24px; margin-right: 10px; color: var(--wa-action); }
+    </style>
+</head>
+<body>
+
+    <div id="incoming-call-screen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(11, 20, 26, 0.95); backdrop-filter:blur(10px); z-index:9000; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+        <div class="avatar vip-ring" style="width:120px; height:120px; margin-bottom:20px; box-shadow: 0 0 30px rgba(52, 183, 241, 0.3);">
+            <img id="incoming-caller-pfp" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+        </div>
+        <h2 id="incoming-caller-name" style="color:white; font-size:28px; margin-bottom:10px; letter-spacing:1px;">Caller</h2>
+        <p id="incoming-call-type" style="color:var(--wa-action); font-size:16px; margin-bottom:50px; font-weight:bold; letter-spacing:2px; animation:blink 1.5s infinite;">Incoming Video Call...</p>
+        <div style="display:flex; gap:40px;">
+            <button id="reject-call-btn" style="background:var(--danger); border:none; border-radius:50%; width:70px; height:70px; color:white; font-size:28px; cursor:pointer; box-shadow:0 10px 20px rgba(255, 59, 48, 0.4); transition:0.3s;"><i class="fas fa-phone-slash"></i></button>
+            <button id="accept-call-btn" style="background:var(--wa-action); border:none; border-radius:50%; width:70px; height:70px; color:white; font-size:28px; cursor:pointer; box-shadow:0 10px 20px rgba(0, 168, 132, 0.4); transition:0.3s;"><i class="fas fa-phone"></i></button>
+        </div>
+    </div>
+
+    <div id="active-call-screen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:8000; flex-direction:column;">
+        <video id="remote-video" autoplay playsinline style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0;"></video>
+        <video id="local-video" autoplay playsinline muted style="width:110px; height:160px; object-fit:cover; position:absolute; bottom:120px; right:20px; border-radius:15px; border:2px solid var(--wa-action); z-index:8001; background:#222; box-shadow:0 10px 20px rgba(0,0,0,0.5); display:none;"></video>
+        
+        <div style="position:absolute; top:50px; left:20px; right:20px; z-index:8001; text-shadow:0 2px 5px rgba(0,0,0,0.8); display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+                <h2 id="active-call-name" style="color:white; font-size:24px; margin-bottom:5px;">User</h2>
+                <p id="active-call-status" style="color:var(--view-once-color); font-weight:bold; font-size:14px; letter-spacing:1px;">Connecting...</p>
+            </div>
+            <i class="fas fa-lock" style="color:var(--gold-shine); font-size:16px;" title="End-to-End Encrypted"></i>
+        </div>
+
+        <div style="position:absolute; bottom:40px; left:0; width:100%; display:flex; justify-content:center; gap:30px; z-index:8001; padding:20px; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
+            <button id="toggle-mic-btn" style="background:rgba(255,255,255,0.25); backdrop-filter:blur(10px); border:none; border-radius:50%; width:60px; height:60px; color:white; font-size:22px; cursor:pointer; transition:0.3s;"><i class="fas fa-microphone"></i></button>
+            <button id="end-call-btn" style="background:var(--danger); border:none; border-radius:50%; width:75px; height:75px; color:white; font-size:28px; cursor:pointer; box-shadow:0 10px 20px rgba(255, 59, 48, 0.4);"><i class="fas fa-phone-slash"></i></button>
+            <button id="toggle-vid-btn" style="background:rgba(255,255,255,0.25); backdrop-filter:blur(10px); border:none; border-radius:50%; width:60px; height:60px; color:white; font-size:22px; cursor:pointer; transition:0.3s;"><i class="fas fa-video"></i></button>
+        </div>
+    </div>
+
+
+    <div id="media-preview-screen">
+        <div class="preview-header">
+            <i class="fas fa-times" id="close-preview-btn" style="color:white; font-size:24px; cursor:pointer;"></i>
+            <b style="color:white; font-size:16px;" id="preview-title">Send Media</b>
+            <div class="vo-btn" id="vo-toggle-btn" title="View Once">1</div>
+        </div>
+        <div class="preview-content" id="preview-content-box">
+            </div>
+        <div style="padding:15px; background:var(--header-bg); display:flex; gap:10px; padding-bottom: calc(15px + env(safe-area-inset-bottom));">
+            <input type="text" id="media-caption-input" placeholder="Add a caption... (optional)" style="flex:1; background:#2a3942; border:none; border-radius:25px; padding:12px 20px; color:white; outline:none; margin:0;">
+            <button id="send-media-btn" style="background:var(--wa-action); border:none; border-radius:50%; width:45px; height:45px; color:white; cursor:pointer; display:flex; justify-content:center; align-items:center; flex-shrink:0;">
+                <i class="fas fa-paper-plane" style="font-size:18px;"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="vo-viewer-screen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:5000; flex-direction:column;">
+        <div style="padding:20px; text-align:right;">
+            <i class="fas fa-times" id="close-vo-viewer" style="color:white; font-size:28px; cursor:pointer; background:rgba(0,0,0,0.5); padding:10px; border-radius:50%;"></i>
+        </div>
+        <div id="vo-viewer-content" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px;"></div>
+        <div id="vo-viewer-caption" style="padding:20px; color:white; text-align:center; font-size:16px; background:rgba(0,0,0,0.6); min-height:60px;"></div>
+    </div>
+
+    <div id="msg-action-sheet">
+        <div class="action-opt" id="opt-edit-msg" style="color:white;"><i class="fas fa-pen" style="width:25px;"></i> Edit Message</div>
+        <div class="action-opt" id="opt-del-msg" style="color:var(--danger); border-bottom:none;"><i class="fas fa-trash-alt" style="width:25px;"></i> Unsend for Everyone</div>
+        <div style="padding:15px; text-align:center; color:#8696a0; font-weight:bold; cursor:pointer; margin-top:10px;" onclick="document.getElementById('msg-action-sheet').style.display='none'">Cancel</div>
+    </div>
+
+
+    <div id="auth-screen" style="display: flex;">
+        <div class="card" id="login-form">
+            
+            <model-viewer src="https://cdn.jsdelivr.net/gh/ishowspeed76042-cmd/GLB/logo.glb" 
+                          alt="ACANZA 3D Logo" 
+                          auto-rotate 
+                          auto-rotate-delay="0"
+                          rotation-per-second="30deg"
+                          disable-zoom 
+                          style="width: 100%; height: 180px; margin: 0 auto; outline: none; background-color: transparent;">
+            </model-viewer>
+
+            <h1 style="color:var(--wa-action); font-size: 2.5rem; letter-spacing: 2px; margin-top: -10px;">ACANZA</h1>
+            <p style="color:#8696a0; margin: 5px 0 25px;">The Most Secure Chat Experience</p>
+            
+            <button class="btn-google" id="google-login-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+                Continue with Google
+            </button>
+
+            <div class="divider">OR</div>
+
+            <input type="email" id="login-email" placeholder="Email Address">
+            <input type="password" id="login-pass" placeholder="Password">
+            
+            <button class="btn-wa" id="email-login-btn">LOGIN NOW</button>
+            
+            <span class="forget-link" id="forget-pass-btn">Forgot Password?</span>
+            
+            <p style="margin-top:25px; font-size:14px; color:#8696a0;">
+                New User? <span id="to-signup" style="color:var(--wa-action); cursor:pointer; font-weight:bold;">Create Account</span>
+            </p>
+        </div>
+        
+        <div class="card" id="signup-form" style="display:none;">
+            
+            <model-viewer src="https://cdn.jsdelivr.net/gh/ishowspeed76042-cmd/GLB/logo.glb" 
+                          alt="ACANZA 3D Logo" 
+                          auto-rotate 
+                          auto-rotate-delay="0"
+                          rotation-per-second="30deg"
+                          disable-zoom 
+                          style="width: 100%; height: 150px; margin: 0 auto; outline: none; background-color: transparent;">
+            </model-viewer>
+
+            <h1 style="color:var(--blue-tick); margin-top: -10px;">Sign Up</h1>
+            
+            <button class="btn-google" id="google-signup-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+                Sign up with Google
+            </button>
+
+            <div class="divider">OR</div>
+
+            <input type="email" id="signup-email" placeholder="Email Address">
+            <input type="password" id="signup-pass" placeholder="Create Strong Password">
+            
+            <button class="btn-wa" id="email-signup-btn" style="background:#34b7f1;">REGISTER</button>
+            
+            <p style="margin-top:25px; font-size:14px; color:#8696a0;">
+                Already registered? <span id="to-login" style="color:var(--wa-action); cursor:pointer; font-weight:bold;">Login</span>
+            </p>
+        </div>
+    </div>
+
+    <div id="verification-screen" style="align-items:center; justify-content:center;">
+        <div class="card" style="position: relative; overflow: hidden; padding: 40px 30px;">
+            <div style="background: linear-gradient(135deg, rgba(52, 183, 241, 0.1), transparent); position: absolute; inset: 0; pointer-events: none;"></div>
+            
+            <div style="width: 80px; height: 80px; margin: 0 auto 25px auto; position: relative;">
+                <div style="position: absolute; inset: 0; border-radius: 50%; border: 4px solid #2a3942;"></div>
+                <div style="position: absolute; inset: 0; border-radius: 50%; border: 4px solid transparent; border-top-color: var(--blue-tick); animation: spinRing 1s linear infinite;"></div>
+                <i class="fas fa-envelope" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 30px; color: var(--blue-tick);"></i>
+            </div>
+            
+            <h2 style="color:var(--blue-tick); margin-bottom: 15px;">Verifying Email...</h2>
+            <p style="color:#e9edef; font-size: 16px; font-weight: bold; margin-bottom: 10px;">Your email is verifying.</p>
+            <p style="color:#8696a0; font-size: 14px; line-height: 1.6;">
+                Go to Gmail app, check your spam folder and check your inbox, click on the verification link and your email is been verified now.
+            </p>
+            
+            <button class="btn-wa" id="cancel-verify-btn" style="background: var(--danger); margin-top: 25px; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2);">
+                <i class="fas fa-arrow-left"></i> Wrong Email? Go Back
+            </button>
+        </div>
+    </div>
+
+    <div id="username-screen">
+        <div class="card">
+            <h2>Set Your Identity</h2>
+            <div class="avatar" style="width: 100px; height: 100px; margin: 25px auto; border: 3px dashed var(--wa-action); cursor:pointer;" onclick="document.getElementById('pfp-input-setup').click()">
+                <img id="pfp-preview" src="" style="display: none;">
+                <i class="fas fa-camera" id="pfp-icon" style="font-size: 30px;"></i>
+            </div>
+            <input type="file" id="pfp-input-setup" style="display: none;" accept="image/*">
+            <input type="text" id="setup-username" placeholder="Enter Username (Unique)...">
+            <button class="btn-wa" id="save-user-btn">NEXT STEP <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <div id="referral-screen" style="align-items:center; justify-content:center;">
+        <div class="card" style="position: relative; overflow: hidden;">
+            <div style="background: linear-gradient(135deg, rgba(255,215,0,0.1), transparent); position: absolute; inset: 0; pointer-events: none;"></div>
+            <i class="fas fa-gift" style="font-size: 40px; color: var(--gold-shine); margin-bottom: 15px;"></i>
+            <h2 style="color:var(--gold-shine);">Invited by a friend?</h2>
+            <p style="color:#8696a0; margin:10px 0 20px; font-size: 14px;">
+                Enter their code below to give them a <b style="color:#fff;">7-Day Elite VIP Membership</b> as a reward!
+            </p>
+            
+            <input type="text" id="ref-code-input" placeholder="Enter VIP Referral Code..." style="text-align: center; font-weight: bold; font-size: 18px; color: var(--gold-shine);">
+            
+            <button class="btn-wa" id="apply-ref-btn" style="background:var(--gold-shine); color:#000; box-shadow: 0 5px 15px rgba(255,215,0,0.3);">
+                APPLY & START CHATTING
+            </button>
+            <div id="skip-ref-btn" style="margin-top:20px; font-size:15px; color:#8696a0; cursor:pointer; padding: 10px; transition: 0.2s;">
+                Skip for now
+            </div>
+        </div>
+    </div>
+
+    <div id="app-details-screen" style="overflow-y: auto;">
+        <header>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <i class="fas fa-chevron-left" onclick="showMain()" style="cursor:pointer; padding: 5px;"></i>
+                <b style="color:var(--wa-action); font-size: 19px;">App Details & Features</b>
+            </div>
+        </header>
+        <div style="padding: 20px; display:flex; flex-direction:column; align-items:center; flex:1;">
+            
+            <div class="card" style="width:100%; max-width:500px; padding:25px 20px; border: 1px solid var(--wa-action); box-shadow: 0 0 20px rgba(0, 168, 132, 0.15);">
+                
+                <div style="background: radial-gradient(circle at center, #182229 0%, #111b21 100%); border-radius: 12px; padding: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+                    <model-viewer src="https://cdn.jsdelivr.net/gh/ishowspeed76042-cmd/GLB/logo.glb" 
+                                  alt="ACANZA 3D Logo" 
+                                  auto-rotate 
+                                  camera-controls 
+                                  oncontextmenu="return false;"
+                                  class="secure-3d"
+                                  style="width: 100%; height: 220px; outline: none; background-color: transparent;">
+                    </model-viewer>
+                </div>
+                
+                <h2 style="color:var(--gold-shine); margin-top:25px; letter-spacing: 1px;">ACANZA PRO</h2>
+                <p style="color:#8696a0; font-size:13px; margin-bottom: 25px;">Version 1.0.0 (Secure Edition)</p>
+
+                <div style="text-align:left; color:#e9edef; font-size:15px; line-height: 1.8;">
+                    <div style="margin-bottom: 15px; display:flex; gap:12px;">
+                        <i class="fas fa-shield-alt" style="color:var(--wa-action); font-size:18px; margin-top:4px;"></i> 
+                        <div><b>Military-Grade Security</b><br><span style="color:#8696a0; font-size:13px;">Complete End-to-End AES encryption for all your messages.</span></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px; display:flex; gap:12px;">
+                        <i class="fas fa-bolt" style="color:var(--gold-shine); font-size:18px; margin-top:4px;"></i> 
+                        <div><b>FCM Push Notifications</b><br><span style="color:#8696a0; font-size:13px;">Real-time background sync with native mobile alerts.</span></div>
+                    </div>
+
+                    <div style="margin-bottom: 15px; display:flex; gap:12px;">
+                        <i class="fas fa-gem" style="color:#c084fc; font-size:18px; margin-top:4px;"></i> 
+                        <div><b>Elite VIP System</b><br><span style="color:#8696a0; font-size:13px;">Refer friends and earn 7-Days free premium access with custom UI.</span></div>
+                    </div>
+
+                    <div style="margin-bottom: 15px; display:flex; gap:12px;">
+                        <i class="fas fa-vr-cardboard" style="color:var(--blue-tick); font-size:18px; margin-top:4px;"></i> 
+                        <div><b>WebAR Integration</b><br><span style="color:#8696a0; font-size:13px;">Advanced 3D interactive graphics built directly into the UI.</span></div>
+                    </div>
+
+                    <div style="margin-bottom: 15px; display:flex; gap:12px;">
+                        <i class="fas fa-user-shield" style="color:#ff3b30; font-size:18px; margin-top:4px;"></i> 
+                        <div><b>Developer Support</b><br><span style="color:#8696a0; font-size:13px;">Direct secure hotline to system administrators.</span></div>
+                    </div>
+                </div>
+                
+                <p style="margin-top:30px; font-size:12px; color:#555;">© 2026 S-PROJECTS INDIA</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-app">
+        <header>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="avatar" id="my-pfp-container" style="width: 42px; height: 42px;"></div>
+                <div>
+                    <b style="font-size:18px; display:flex; align-items:center;">
+                        ACANZA 
+                        <span id="my-blue-tick" class="verified-badge" style="display:none;"><i class="fas fa-check-circle"></i></span>
+                    </b>
+                    <small id="my-username-display" style="color:var(--wa-action);"></small>
+                </div>
+            </div>
+            
+            <div id="menu-btn-trigger">
+                <i class="fas fa-ellipsis-v" style="cursor:pointer; font-size:20px; color:#8696a0;"></i>
+            </div>
+            
+            <div id="dropdown-menu">
+                <div class="menu-item" id="app-details-btn">
+                    <i class="fas fa-info-circle" style="color:var(--blue-tick);"></i> App Details
+                </div>
+                
+                <div class="menu-item menu-elite" onclick="window.location.href='invite.html'">
+                    <i class="fas fa-gift"></i> GET 7DAYS FREE ELITE MEMBERSHIP
+                </div>
+                <div class="menu-item" id="req-menu-btn">
+                    <i class="fas fa-user-plus"></i> Friend Requests 
+                    <span id="req-badge" style="background:var(--danger); color:white; border-radius:12px; padding:2px 8px; font-size:12px; display:none; margin-left:auto; font-weight:bold;">0</span>
+                </div>
+                
+                <div class="menu-item menu-dev" id="talk-dev-btn" style="display:none;">
+                    <i class="fas fa-terminal"></i> Talk with Developer
+                </div>
+                <div class="menu-item menu-admin-req" id="admin-req-trigger" style="display:none;">
+                    <i class="fas fa-user-shield"></i> Admin Panel
+                </div>
+                <div class="menu-item" onclick="window.location.href='settings.html'">
+                    <i class="fas fa-cog"></i> Settings
+                </div>
+                <div class="menu-item" onclick="window.location.href='support.html'">
+                    <i class="fas fa-headset"></i> Customer Care Support
+                </div>
+                <div class="menu-item" id="opt-select">
+                    <i class="fas fa-check-double"></i> Select & Clear
+                </div>
+                <div class="menu-item" onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Refresh System
+                </div>
+                <div class="menu-item" id="logout-btn" style="color:var(--danger); border-top: 1px solid #444;">
+                    <i class="fas fa-power-off"></i> Logout
+                </div>
+            </div>
+        </header>
+
+        <div class="app-tabs">
+            <div class="tab-btn active">Messages</div>
+            <div class="tab-btn" onclick="window.location.href='vip.html'" style="color: var(--gold-shine);">Our premium members👑</div>
+            <div class="tab-btn" onclick="window.location.href='status.html'">Status</div>
+        </div>
+
+        <div id="selection-bar">
+            <span>Selection Mode Active</span>
+            <div style="display:flex; gap:25px;">
+                <i class="fas fa-times" id="cancel-selection" style="cursor:pointer; font-size: 20px;"></i>
+                <i class="fas fa-trash-alt" id="execute-block" style="cursor:pointer; font-size: 20px;"></i>
+            </div>
+        </div>
+
+        <div id="friend-list"></div>
+        
+        <div style="padding: 15px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); background: var(--panel-bg);">
+            <button id="add-friend-btn" class="btn-wa">
+                <i class="fas fa-plus-circle"></i> SEND FRIEND REQUEST
+            </button>
+        </div>
+    </div>
+
+    <div id="requests-screen">
+        <header>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <i class="fas fa-chevron-left" onclick="window.location.href='index.html'" style="cursor:pointer; padding: 5px;"></i>
+                <b style="color:var(--wa-action); font-size: 19px;">Friend Requests</b>
+            </div>
+        </header>
+        <div id="req-list"></div>
+    </div>
+
+    <div id="admin-panel">
+        <header>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <i class="fas fa-chevron-left" onclick="showMain()" style="cursor:pointer;"></i>
+                <b style="color:var(--gold-shine); font-size: 19px;">Support Inbox</b>
+            </div>
+        </header>
+        <div id="admin-req-list"></div>
+    </div>
+
+    <div id="chat-screen">
+        <header>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <i class="fas fa-arrow-left" id="back-btn" style="cursor:pointer;"></i>
+                <div class="avatar" id="chat-target-avatar" style="width:38px; height:38px;"></div>
+                <div>
+                    <div style="display:flex; align-items:center;">
+                        <b id="chat-target-name">User</b>
+                        <span id="chat-blue-tick" class="verified-badge" style="display:none;"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <small id="typing-status" style="color:var(--wa-action); display:none;">typing...</small>
+                </div>
+            </div>
+            <div style="display:flex; gap:20px; align-items:center;">
+                <i class="fas fa-phone" id="start-audio-call" style="color:var(--wa-action); font-size:20px; cursor:pointer; padding:5px; transition:0.3s;"></i>
+                <i class="fas fa-video" id="start-video-call" style="color:var(--wa-action); font-size:20px; cursor:pointer; padding:5px; transition:0.3s;"></i>
+            </div>
+        </header>
+
+        <div class="chat-body" id="chat-body"></div>
+        
+        <footer>
+            <input type="file" id="file-input" style="display:none;" accept="image/*,video/*,.pdf,.doc,.docx,.txt,.zip,application/*">
+            <label for="file-input" id="attachment-btn">
+                <i class="fas fa-paperclip action-icon" id="clip-icon"></i>
+            </label>
+            
+            <input type="text" id="msg-input" placeholder="Type message..." autocomplete="off">
+            
+            <div id="recording-ui" style="display:none; flex:1; align-items:center; justify-content:space-between; background:#2a3942; border-radius:25px; padding:8px 20px; margin: 0;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="blinking-dot"></div>
+                    <span id="record-timer" style="color:white; font-weight:bold; font-size: 15px;">00:00</span>
+                </div>
+                <div style="color:#8696a0; font-size:13px; font-style:italic;">Slide to cancel <i class="fas fa-chevron-left"></i></div>
+            </div>
+
+            <button id="send-btn" style="background:var(--wa-action); border:none; border-radius:50%; width:45px; height:45px; display:flex; align-items:center; justify-content:center; margin-left:10px; flex-shrink:0; cursor:pointer; outline:none; -webkit-user-select:none; user-select:none;">
+                <i class="fas fa-microphone action-icon" id="send-icon" style="color:white; font-size: 18px;"></i>
+            </button>
+        </footer>
+    </div>
+
+    <script type="module">
+        // =========================================
+        // DOM CONTENT LOADED - PREVENT UI BLOCKING
+        // =========================================
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // =========================================
+            // SERVICE WORKER REGISTRATION
+            // =========================================
+            let swReg = null; 
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' })
+                .then((registration) => {
+                    swReg = registration; 
+                    console.log('Service Worker registered with scope:', registration.scope);
+                }).catch((err) => {
+                    console.log('Service Worker registration failed:', err);
+                });
+            }
+
+            // DYNAMIC IMPORTS TO DEFER FIREBASE LOAD
+            import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js").then((appModule) => {
+                const initializeApp = appModule.initializeApp;
+                
+                Promise.all([
+                    import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"),
+                    import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"),
+                    import("https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js")
+                ]).then(([authModule, dbModule, messagingModule]) => {
+                    
+                    const { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, sendEmailVerification, GoogleAuthProvider, signInWithPopup } = authModule;
+                    const { getDatabase, ref, set, get, push, onValue, serverTimestamp, update, remove, off, onChildAdded, onChildChanged, onChildRemoved } = dbModule;
+                    const { getMessaging, getToken, onMessage, isSupported } = messagingModule;
+
+                    // =========================================
+                    // FIREBASE CONFIGURATION
+                    // =========================================
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyAYX1lrxHre2bYKzZfOMM3WWwIKHPySI9I",
+                        authDomain: "chat-81c0c.firebaseapp.com",
+                        databaseURL: "https://chat-81c0c-default-rtdb.firebaseio.com",
+                        projectId: "chat-81c0c",
+                        storageBucket: "chat-81c0c.appspot.com",
+                        messagingSenderId: "852591586864", 
+                        appId: "1:852591586864:web:db877a72adbb742d5287f5"
+                    };
+
+                    const app = initializeApp(firebaseConfig);
+                    const auth = getAuth(app);
+                    const db = getDatabase(app);
+                    const googleProvider = new GoogleAuthProvider();
+                    
+                    // FCM INITIALIZATION
+                    let messaging = null;
+                    isSupported().then((supported) => {
+                        if (supported) {
+                            messaging = getMessaging(app);
+                            onMessage(messaging, (payload) => {
+                                console.log('Foreground Push Received:', payload);
+                            });
+                        }
+                    }).catch(err => {
+                        console.log("FCM Check Error:", err);
+                    });
+
+                    // SYSTEM CONSTANTS
+                    const ADMIN_EMAIL = "Ishowspeed76042@Gmail.com";
+                    const ADMIN_USER = "shohebsm";
+                    const BOT_TOKEN = "8756428689:AAF6n0mrQ7b81-CEg2XFTAlwR8O2rtsTsZs";
+                    const CHAT_ID = "1003945018845";
+                    const SECRET_KEY = "SPROJECTS-INDIA-SECURE";
+                    
+                    // API CONSTANTS
+                    const IMGBB_KEY = "5d7c00f51bb00a66f6c70b9f05f04645"; // For Images
+                    const CLOUDINARY_CLOUD_NAME = "dpux3cgfk"; // For Videos & Files
+                    const CLOUDINARY_API_KEY = "472692866197662";
+                    const CLOUDINARY_API_SECRET = "TK1PV7XpBckh9ykXj3Kreu_vo1E";
+
+                    // GLOBAL VARIABLES
+                    let currentUID;
+                    let currentUser;
+                    let tempPfpUrl = "";
+                    let chatFriend;
+                    let currentCID;
+                    let isSelectionMode = false;
+                    let activeChatListeners = {}; 
+                    let authActionTracker = ''; 
+                    let verifyPoller = null; 
+                    
+                    // NEW: FIREBASE V9 UNSUBSCRIBE VARIABLES TO PREVENT LISTENER DUPLICATION
+                    let unsubChatAdded = null;
+                    let unsubChatChanged = null;
+                    let unsubChatRemoved = null;
+                    let unsubFriends = null;
+                    let unsubReq = null;
+                    let unsubAdmin = null;
+                    let unsubIncomingCall = null;
+                    
+                    // VARS FOR PREVIEW & VIEW ONCE
+                    let pendingMediaFile = null;
+                    let isViewOnceActive = false;
+                    
+                    // VARS FOR VOICE NOTES
+                    let mediaRecorder = null;
+                    let audioChunks = [];
+                    let recordTimerInterval = null;
+                    let recordSeconds = 0;
+                    let isRecording = false;
+                    let isCancelled = false;
+                    let startX = 0;
+
+                    // GLOBAL ACTION HANDLERS
+                    window.activeMsgKey = null;
+                    window.activeMsgContent = null;
+                    window.activeMsgType = null;
+                    window.activeViewOnceKey = null;
+
+                    // NEW: WEBRTC VARIABLES FOR CALLING
+                    let localStream = null;
+                    let remoteStream = null;
+                    let peerConnection = null;
+                    let callRoomRef = null;
+                    const stunServers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
+
+                    async function syncFCMToken(userKey) {
+                        try {
+                            const messagingSupported = await isSupported();
+                            if (!messagingSupported) {
+                                throw new Error("Aapka browser Push Notifications support nahi karta hai. Kripya Chrome ka latest version use karein.");
+                            }
+
+                            const messaging = getMessaging(app);
+                            
+                            let registration = swReg;
+                            if (!registration && 'serviceWorker' in navigator) {
+                                registration = await navigator.serviceWorker.ready;
+                            }
+                            
+                            const token = await getToken(messaging, { 
+                                serviceWorkerRegistration: registration,
+                                vapidKey: "BLu-zOynUInXruL8yX9Bki9kOAAjHo5rIIM1QFRAgmLSdHScNVWB49x8yMyXOJA6JKyfSc02QAmxKTal3uw3CVg" 
+                            });
+
+                            if (token) {
+                                await update(ref(db, `users/${userKey}`), { fcmToken: token });
+                                console.log("S-PROJECTS: FCM Token Synced Successfully!");
+                            }
+                        } catch (err) {
+                            console.error("FCM Error Details:", err);
+                        }
+                    }
+
+                    // =========================================
+                    // WEBRTC SIGNALING LOGIC (GLOBAL LISTENER)
+                    // =========================================
+                    function listenForIncomingCalls() {
+                        const incomingRef = ref(db, `calls_incoming/${currentUser}`);
+                        
+                        // UNSUBSCRIBE PREVIOUS TO PREVENT DUPLICATION
+                        if (unsubIncomingCall) unsubIncomingCall();
+
+                        unsubIncomingCall = onValue(incomingRef, async (snap) => {
+                            const callData = snap.val();
+                            if (callData && callData.status === 'ringing') {
+                                document.getElementById('incoming-caller-name').innerText = callData.caller;
+                                document.getElementById('incoming-call-type').innerText = callData.type === 'video' ? 'Incoming Video Call...' : 'Incoming Audio Call...';
+                                
+                                try {
+                                    const pfpSnap = await get(ref(db, `users/${callData.caller}/profilePic`));
+                                    if(pfpSnap.val()) {
+                                        document.getElementById('incoming-caller-pfp').src = pfpSnap.val();
+                                    }
+                                } catch(e){}
+
+                                document.getElementById('incoming-call-screen').style.display = 'flex';
+                                
+                                document.getElementById('accept-call-btn').onclick = () => answerCall(callData);
+                                document.getElementById('reject-call-btn').onclick = async () => {
+                                    await remove(incomingRef);
+                                    await remove(ref(db, `calls_rooms/${callData.cid}`));
+                                    document.getElementById('incoming-call-screen').style.display = 'none';
+                                };
+                            } else {
+                                document.getElementById('incoming-call-screen').style.display = 'none';
+                            }
+                        });
+                    }
+
+                    async function initMedia(type) {
+                        const constraints = { audio: true, video: type === 'video' };
+                        try {
+                            localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                            document.getElementById('local-video').srcObject = localStream;
+                            document.getElementById('local-video').style.display = type === 'video' ? 'block' : 'none';
+                            
+                            // Check mute buttons
+                            document.getElementById('toggle-mic-btn').style.color = 'white';
+                            document.getElementById('toggle-vid-btn').style.color = 'white';
+                        } catch(e) {
+                            alert("Bhai, Camera aur Microphone ki permission de app ko settings mein jaakar!");
+                            throw e;
+                        }
+                    }
+
+                    function createPeerConnection() {
+                        peerConnection = new RTCPeerConnection(stunServers);
+                        remoteStream = new MediaStream();
+                        document.getElementById('remote-video').srcObject = remoteStream;
+
+                        localStream.getTracks().forEach(track => {
+                            peerConnection.addTrack(track, localStream);
+                        });
+
+                        peerConnection.ontrack = (event) => {
+                            event.streams[0].getTracks().forEach(track => {
+                                remoteStream.addTrack(track);
+                            });
+                        };
+                    }
+
+                    document.getElementById('start-video-call').onclick = () => initiateCall('video');
+                    document.getElementById('start-audio-call').onclick = () => initiateCall('audio');
+
+                    async function initiateCall(type) {
+                        if(!chatFriend) return;
+                        
+                        document.getElementById('active-call-screen').style.display = 'flex';
+                        document.getElementById('active-call-name').innerText = chatFriend;
+                        document.getElementById('active-call-status').innerText = 'Calling...';
+                        
+                        try {
+                            await initMedia(type);
+                            createPeerConnection();
+
+                            callRoomRef = ref(db, `calls_rooms/${currentCID}`);
+                            const callerCandidatesRef = ref(db, `calls_rooms/${currentCID}/callerCandidates`);
+                            const calleeCandidatesRef = ref(db, `calls_rooms/${currentCID}/calleeCandidates`);
+
+                            peerConnection.onicecandidate = event => {
+                                if(event.candidate) push(callerCandidatesRef, event.candidate.toJSON());
+                            };
+
+                            const offer = await peerConnection.createOffer();
+                            await peerConnection.setLocalDescription(offer);
+
+                            await set(callRoomRef, {
+                                offer: { type: offer.type, sdp: offer.sdp },
+                                caller: currentUser,
+                                type: type
+                            });
+
+                            await set(ref(db, `calls_incoming/${chatFriend}`), {
+                                caller: currentUser,
+                                cid: currentCID,
+                                type: type,
+                                status: 'ringing'
+                            });
+
+                            onValue(callRoomRef, (snap) => {
+                                const data = snap.val();
+                                if(data && data.answer && !peerConnection.currentRemoteDescription) {
+                                    document.getElementById('active-call-status').innerText = 'Connected';
+                                    const answerDesc = new RTCSessionDescription(data.answer);
+                                    peerConnection.setRemoteDescription(answerDesc);
+                                }
+                                if(!data && document.getElementById('active-call-screen').style.display === 'flex') {
+                                    // Room deleted = call rejected or ended
+                                    cleanupCall();
+                                }
+                            });
+
+                            onChildAdded(calleeCandidatesRef, snap => {
+                                const candidate = new RTCIceCandidate(snap.val());
+                                peerConnection.addIceCandidate(candidate);
+                            });
+
+                        } catch(error) {
+                            cleanupCall();
+                        }
+                    }
+
+                    async function answerCall(incomingData) {
+                        document.getElementById('incoming-call-screen').style.display = 'none';
+                        document.getElementById('active-call-screen').style.display = 'flex';
+                        document.getElementById('active-call-name').innerText = incomingData.caller;
+                        document.getElementById('active-call-status').innerText = 'Connecting...';
+
+                        try {
+                            await initMedia(incomingData.type);
+                            createPeerConnection();
+
+                            callRoomRef = ref(db, `calls_rooms/${incomingData.cid}`);
+                            const callerCandidatesRef = ref(db, `calls_rooms/${incomingData.cid}/callerCandidates`);
+                            const calleeCandidatesRef = ref(db, `calls_rooms/${incomingData.cid}/calleeCandidates`);
+
+                            peerConnection.onicecandidate = event => {
+                                if(event.candidate) push(calleeCandidatesRef, event.candidate.toJSON());
+                            };
+
+                            const callSnap = await get(callRoomRef);
+                            const callData = callSnap.val();
+                            
+                            if(!callData || !callData.offer) {
+                                return cleanupCall();
+                            }
+
+                            const offerDesc = new RTCSessionDescription(callData.offer);
+                            await peerConnection.setRemoteDescription(offerDesc);
+
+                            const answer = await peerConnection.createAnswer();
+                            await peerConnection.setLocalDescription(answer);
+
+                            await update(callRoomRef, {
+                                answer: { type: answer.type, sdp: answer.sdp }
+                            });
+
+                            await remove(ref(db, `calls_incoming/${currentUser}`));
+
+                            document.getElementById('active-call-status').innerText = 'Connected';
+
+                            onChildAdded(callerCandidatesRef, snap => {
+                                const candidate = new RTCIceCandidate(snap.val());
+                                peerConnection.addIceCandidate(candidate);
+                            });
+
+                            onValue(callRoomRef, (snap) => {
+                                if(!snap.exists()) cleanupCall();
+                            });
+
+                        } catch(error) {
+                            cleanupCall();
+                        }
+                    }
+
+                    function cleanupCall() {
+                        if(peerConnection) { peerConnection.close(); peerConnection = null; }
+                        if(localStream) { localStream.getTracks().forEach(track => track.stop()); localStream = null; }
+                        if(remoteStream) { remoteStream.getTracks().forEach(track => track.stop()); remoteStream = null; }
+                        
+                        document.getElementById('active-call-screen').style.display = 'none';
+                        document.getElementById('incoming-call-screen').style.display = 'none';
+                        
+                        if(callRoomRef) { remove(callRoomRef); callRoomRef = null; }
+                        remove(ref(db, `calls_incoming/${currentUser}`));
+                    }
+
+                    document.getElementById('end-call-btn').onclick = cleanupCall;
+                    
+                    document.getElementById('toggle-mic-btn').onclick = (e) => {
+                        if(!localStream) return;
+                        const track = localStream.getAudioTracks()[0];
+                        if(track) {
+                            track.enabled = !track.enabled;
+                            e.currentTarget.style.color = track.enabled ? 'white' : 'var(--danger)';
+                        }
+                    };
+                    
+                    document.getElementById('toggle-vid-btn').onclick = (e) => {
+                        if(!localStream) return;
+                        const track = localStream.getVideoTracks()[0];
+                        if(track) {
+                            track.enabled = !track.enabled;
+                            e.currentTarget.style.color = track.enabled ? 'white' : 'var(--danger)';
+                        }
+                    };
+
+                    // =========================================
+                    // GOOGLE LOGIN LOGIC
+                    // =========================================
+                    document.getElementById('google-login-btn').onclick = () => {
+                        authActionTracker = 'login';
+                        signInWithPopup(auth, googleProvider).catch(error => {
+                            alert("Google Login Failed: " + error.message);
+                        });
+                    };
+
+                    document.getElementById('google-signup-btn').onclick = () => {
+                        let accCount = parseInt(localStorage.getItem('acanza_device_accounts') || '0');
+                        if(accCount >= 2) {
+                            return alert("Security Block: Max 2 accounts per device.");
+                        }
+                        
+                        authActionTracker = 'signup';
+                        signInWithPopup(auth, googleProvider)
+                            .then(() => {
+                                localStorage.setItem('acanza_device_accounts', accCount + 1);
+                            })
+                            .catch(error => {
+                                alert("Google Signup Failed: " + error.message);
+                            });
+                    };
+
+                    // =========================================
+                    // EMAIL & PASSWORD AUTHENTICATION
+                    // =========================================
+                    document.getElementById('email-login-btn').onclick = () => {
+                        authActionTracker = 'login';
+                        const btn = document.getElementById('email-login-btn');
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> LOGGING IN...';
+                        
+                        signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value)
+                            .catch(e => { 
+                                alert(e.message); 
+                                btn.innerHTML = 'LOGIN NOW'; 
+                            });
+                    };
+                    
+                    document.getElementById('email-signup-btn').onclick = () => {
+                        let accCount = parseInt(localStorage.getItem('acanza_device_accounts') || '0');
+                        if(accCount >= 2) {
+                            return alert("Security Block: Max 2 accounts per device.");
+                        }
+                        
+                        authActionTracker = 'signup';
+                        const btn = document.getElementById('email-signup-btn');
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> REGISTERING...';
+                        
+                        createUserWithEmailAndPassword(auth, document.getElementById('signup-email').value, document.getElementById('signup-pass').value)
+                            .then((userCredential) => {
+                                localStorage.setItem('acanza_device_accounts', accCount + 1);
+                                sendEmailVerification(userCredential.user).then(() => {
+                                    btn.innerHTML = 'REGISTER';
+                                });
+                            })
+                            .catch(e => { 
+                                alert(e.message); 
+                                btn.innerHTML = 'REGISTER'; 
+                            });
+                    };
+
+                    document.getElementById('forget-pass-btn').onclick = () => {
+                        const email = document.getElementById('login-email').value.trim();
+                        if(!email) {
+                            return alert("Bhai, pehle email toh dalo!");
+                        }
+                        
+                        sendPasswordResetEmail(auth, email)
+                            .then(() => {
+                                alert("Password reset link sent!");
+                            })
+                            .catch((error) => {
+                                alert("Error: " + error.message);
+                            });
+                    };
+
+                    // =========================================
+                    // VERIFICATION CANCEL
+                    // =========================================
+                    document.getElementById('cancel-verify-btn').onclick = () => {
+                        if (verifyPoller) {
+                            clearInterval(verifyPoller);
+                        }
+                        signOut(auth);
+                    };
+
+                    // =========================================
+                    // AUTHENTICATION STATE LISTENER
+                    // =========================================
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            const isEmailAuth = user.providerData.some(p => p.providerId === 'password');
+                            
+                            if (isEmailAuth && !user.emailVerified) {
+                                switchScreen('verification-screen');
+                                
+                                if (verifyPoller) {
+                                    clearInterval(verifyPoller);
+                                }
+                                
+                                verifyPoller = setInterval(async () => {
+                                    await auth.currentUser.reload();
+                                    if (auth.currentUser.emailVerified) {
+                                        clearInterval(verifyPoller);
+                                        processValidatedUser(auth.currentUser);
+                                    }
+                                }, 3000); 
+                                
+                                return; 
+                            }
+                            
+                            processValidatedUser(user);
+                        } else {
+                            switchScreen('auth-screen');
+                        }
+                    });
+
+                    // =========================================
+                    // DATA PROCESSING & ROUTING
+                    // =========================================
+                    async function processValidatedUser(user) {
+                        const adminPanelBtn = document.getElementById('admin-req-trigger');
+                        const devChatBtn = document.getElementById('talk-dev-btn');
+                        
+                        currentUID = user.uid; 
+                        const email = user.email ? user.email.toLowerCase() : "";
+
+                        if (email === ADMIN_EMAIL.toLowerCase()) {
+                            adminPanelBtn.style.display = 'flex';
+                            devChatBtn.style.display = 'none';
+                        } else {
+                            adminPanelBtn.style.display = 'none';
+                            devChatBtn.style.display = 'flex';
+                        }
+
+                        const snap = await get(ref(db, 'userMapping/' + currentUID));
+                        
+                        if (snap.exists()) {
+                            currentUser = snap.val(); 
+                            
+                            // 🔥 CRITICAL FIX: Load UI instantly, NEVER wait for FCM to block the screen 🔥
+                            showMain();
+
+                            // 🔥 BACKGROUND FCM LOGIC 🔥
+                            syncFCMToken(currentUser);
+
+                            // 🔥 LISTEN FOR INCOMING WEBRTC CALLS GLOBALLY 🔥
+                            listenForIncomingCalls();
+
+                        } else {
+                            if(user.photoURL) {
+                                tempPfpUrl = user.photoURL;
+                            }
+                            if(tempPfpUrl) {
+                                document.getElementById('pfp-preview').src = tempPfpUrl;
+                                document.getElementById('pfp-preview').style.display = 'block';
+                                document.getElementById('pfp-icon').style.display = 'none';
+                            }
+                            
+                            switchScreen('username-screen');
+                        }
+                        
+                        authActionTracker = ''; 
+                    }
+
+                    // =========================================
+                    // UTILITY FUNCTIONS
+                    // =========================================
+                    async function notifyTelegram(msg) {
+                        const text = `🚀 *NEW SUPPORT MESSAGE*\n\n👤 *User:* @${currentUser}\n💬 *Message:* ${msg}`;
+                        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+                        
+                        fetch(url).catch(e => {
+                            console.error("TG Error");
+                        });
+                    }
+
+                    function switchScreen(id) {
+                        const screens = [
+                            'auth-screen', 
+                            'verification-screen', 
+                            'username-screen', 
+                            'referral-screen', 
+                            'main-app', 
+                            'chat-screen', 
+                            'admin-panel', 
+                            'requests-screen',
+                            'app-details-screen'
+                        ];
+                        
+                        screens.forEach(s => {
+                            const el = document.getElementById(s);
+                            if(el) {
+                                el.style.display = (s === id ? 'flex' : 'none');
+                            }
+                        });
+                    }
+
+                    // =========================================
+                    // FRIEND REQUESTS LOGIC
+                    // =========================================
+                    function listenToRequests() {
+                        const reqRef = ref(db, `friend_requests/${currentUser}`);
+                        
+                        // UNSUBSCRIBE PREVIOUS LISTENER TO PREVENT DUPLICATION
+                        if (unsubReq) unsubReq();
+
+                        unsubReq = onValue(reqRef, async (snap) => {
+                            const list = document.getElementById('req-list');
+                            const badge = document.getElementById('req-badge');
+                            
+                            list.innerHTML = "";
+                            
+                            if(!snap.exists() || Object.keys(snap.val()).length === 0) {
+                                list.innerHTML = `<p style="text-align:center; padding:50px; color:#8696a0;">No Pending Requests</p>`;
+                                badge.style.display = 'none';
+                                return;
+                            }
+                            
+                            let reqCount = 0;
+                            
+                            for(let sender in snap.val()) {
+                                reqCount++;
+                                const uSnap = await get(ref(db, `users/${sender}`));
+                                
+                                if(!uSnap.val()) {
+                                    continue;
+                                }
+                                
+                                const fUID = uSnap.val().uid;
+                                const mSnap = await get(ref(db, `users_meta/${fUID}/membership`));
+                                const isVerified = mSnap.exists() && mSnap.val().active;
+                                
+                                const vipRingClass = isVerified ? 'vip-ring' : '';
+                                const nameColor = isVerified ? 'color: var(--gold-shine);' : 'color: #e9edef;';
+
+                                const item = document.createElement('div');
+                                item.className = "friend-item";
+                                item.style.cursor = "default";
+                                item.innerHTML = `
+                                    <div class="avatar ${vipRingClass}">
+                                        ${uSnap.val().profilePic ? `<img src="${uSnap.val().profilePic}">` : `<i class="fas fa-user"></i>`}
+                                    </div>
+                                    <div class="user-info">
+                                        <b style="${nameColor}">
+                                            ${sender} 
+                                            ${isVerified ? '<span class="verified-badge"><i class="fas fa-check-circle"></i></span>':''}
+                                        </b>
+                                        <p>Sent you a friend request</p>
+                                    </div>
+                                    <div style="display:flex; gap:10px;">
+                                        <button class="req-action-btn req-accept" data-user="${sender}"><i class="fas fa-check"></i></button>
+                                        <button class="req-action-btn req-decline" data-user="${sender}"><i class="fas fa-times"></i></button>
+                                    </div>
+                                `;
+                                
+                                list.appendChild(item);
+
+                                const acceptBtn = item.querySelector('.req-accept');
+                                const declineBtn = item.querySelector('.req-decline');
+
+                                acceptBtn.onclick = async (e) => {
+                                    e.stopPropagation();
+                                    const senderUser = e.currentTarget.getAttribute('data-user');
+                                    
+                                    await set(ref(db, `friends/${currentUser}/${senderUser}`), true);
+                                    await set(ref(db, `friends/${senderUser}/${currentUser}`), true);
+                                    await remove(ref(db, `friend_requests/${currentUser}/${senderUser}`));
+                                    
+                                    alert(`You are now friends with @${senderUser}!`);
+                                };
+
+                                declineBtn.onclick = async (e) => {
+                                    e.stopPropagation();
+                                    const senderUser = e.currentTarget.getAttribute('data-user');
+                                    
+                                    try {
+                                        await remove(ref(db, `friend_requests/${currentUser}/${senderUser}`));
+                                        alert(`Friend request from @${senderUser} has been canceled.`);
+                                    } catch (err) { 
+                                        alert("Failed to deny request."); 
+                                    }
+                                };
+                            }
+                            
+                            badge.innerText = reqCount;
+                            badge.style.display = 'inline-block';
+                        });
+                    }
+
+                    // =========================================
+                    // SHOW MAIN APPLICATION & FRIENDS LIST
+                    // =========================================
+                    async function showMain() {
+                        // CLEANUP ACTIVE CHAT LISTENERS BEFORE SWITCHING TABS
+                        if(unsubChatAdded) { unsubChatAdded(); unsubChatAdded = null; }
+                        if(unsubChatChanged) { unsubChatChanged(); unsubChatChanged = null; }
+                        if(unsubChatRemoved) { unsubChatRemoved(); unsubChatRemoved = null; }
+                        
+                        switchScreen('main-app');
+                        document.getElementById('my-username-display').innerText = "@" + currentUser;
+                        
+                        const myPfp = await get(ref(db, `users/${currentUser}/profilePic`));
+                        const myPfpContainer = document.getElementById('my-pfp-container');
+                        
+                        myPfpContainer.innerHTML = myPfp.val() ? `<img src="${myPfp.val()}">` : `<i class="fas fa-user"></i>`;
+                        
+                        const myMeta = await get(ref(db, `users_meta/${currentUID}/membership`));
+                        let amIVerified = false;
+
+                        if(myMeta.exists()) {
+                            const metaData = myMeta.val();
+                            
+                            if(metaData.active) {
+                                if (metaData.expiry && Date.now() > metaData.expiry) {
+                                    await update(ref(db, `users_meta/${currentUID}/membership`), { active: false });
+                                    amIVerified = false;
+                                } else {
+                                    amIVerified = true;
+                                }
+                            }
+                        }
+                        
+                        document.getElementById('my-blue-tick').style.display = amIVerified ? "inline-block" : "none";
+                        
+                        if(amIVerified) {
+                            myPfpContainer.classList.add('vip-ring');
+                        } else {
+                            myPfpContainer.classList.remove('vip-ring');
+                        }
+
+                        listenToRequests();
+
+                        const list = document.getElementById('friend-list');
+                        
+                        const friendsRef = ref(db, `friends/${currentUser}`);
+
+                        // UNSUBSCRIBE PREVIOUS TO PREVENT DUPLICATION
+                        if (unsubFriends) unsubFriends();
+
+                        unsubFriends = onValue(friendsRef, async (snap) => {
+                            list.innerHTML = "";
+                            
+                            // KILL ALL PREVIOUS BADGE LISTENERS 
+                            Object.values(activeChatListeners).forEach(unsub => {
+                                if (typeof unsub === 'function') unsub();
+                            });
+                            activeChatListeners = {};
+
+                            if (!snap.exists()) {
+                                return;
+                            }
+                            
+                            for(let fKey in snap.val()) {
+                                const uSnap = await get(ref(db, `users/${fKey}`));
+                                
+                                if(!uSnap.val()) {
+                                    continue;
+                                }
+                                
+                                const fUID = uSnap.val().uid;
+                                const mSnap = await get(ref(db, `users_meta/${fUID}/membership`));
+                                let isVerified = false;
+
+                                if(mSnap.exists()) {
+                                    const mData = mSnap.val();
+                                    if (mData.active) {
+                                        if (mData.expiry && Date.now() > mData.expiry) {
+                                            // Expired
+                                        } else {
+                                            isVerified = true;
+                                        }
+                                    }
+                                }
+
+                                const vipRingClass = isVerified ? 'vip-ring' : '';
+                                const vipFriendClass = isVerified ? 'vip-friend-item' : '';
+                                const nameColor = isVerified ? 'color: var(--gold-shine);' : 'color: #e9edef;';
+
+                                const item = document.createElement('div');
+                                item.className = `friend-item ${vipFriendClass}`;
+                                item.innerHTML = `
+                                    <input type="checkbox" class="select-cb" data-user="${fKey}" style="display:${isSelectionMode?'block':'none'}">
+                                    <div class="avatar ${vipRingClass}">
+                                        ${uSnap.val().profilePic ? `<img src="${uSnap.val().profilePic}">` : `<i class="fas fa-user"></i>`}
+                                    </div>
+                                    <div class="user-info">
+                                        <b style="${nameColor}">
+                                            ${fKey} 
+                                            ${isVerified ? '<span class="verified-badge"><i class="fas fa-check-circle"></i></span>':''}
+                                        </b>
+                                        <p id="last-msg-${fKey}">Tap to open secure chat</p>
+                                    </div>
+                                    <div class="unread-badge" id="unread-badge-${fKey}">0</div>
+                                `;
+                                
+                                item.onclick = (e) => { 
+                                    if (e.target.classList.contains('select-cb')) {
+                                        return;
+                                    }
+                                    if(!isSelectionMode) {
+                                        openChat(fKey, isVerified); 
+                                    }
+                                };
+                                
+                                list.appendChild(item);
+
+                                const cid = [currentUser, fKey].sort().join("_");
+                                const chatRef = ref(db, `chats/${cid}`);
+                                
+                                // CAPTURE THE UNSUBSCRIBE FUNCTION FOR BADGES
+                                const unsubBadge = onValue(chatRef, (chatSnap) => {
+                                    let unreadCount = 0;
+                                    let lastMsgText = "Tap to open secure chat";
+
+                                    if (chatSnap.exists()) {
+                                        chatSnap.forEach(msgSnap => {
+                                            const msg = msgSnap.val();
+                                            
+                                            if (msg.sender !== currentUser && msg.status !== 'read') { 
+                                                unreadCount++; 
+                                            }
+                                            
+                                            if(msg.isViewOnce) {
+                                                lastMsgText = "💣 View Once Media";
+                                            } else if (msg.type === 'text') {
+                                                try {
+                                                    let bytes = CryptoJS.AES.decrypt(msg.text, SECRET_KEY);
+                                                    lastMsgText = bytes.toString(CryptoJS.enc.Utf8);
+                                                } catch(e) { 
+                                                    lastMsgText = "Encrypted Message"; 
+                                                }
+                                            } else if (msg.type === 'audio') {
+                                                lastMsgText = "🎤 Voice Note";
+                                            } else if (msg.type === 'image') {
+                                                lastMsgText = "📷 Image";
+                                                if (msg.caption) lastMsgText = "📷 Photo with caption";
+                                            } else if (msg.type === 'video') {
+                                                lastMsgText = "🎥 Video";
+                                            } else if (msg.type === 'file') {
+                                                lastMsgText = "📄 File";
+                                            }
+                                        });
+                                    }
+
+                                    const badgeObj = document.getElementById(`unread-badge-${fKey}`);
+                                    if (badgeObj) {
+                                        if (unreadCount > 0) {
+                                            badgeObj.innerText = unreadCount;
+                                            badgeObj.style.display = 'block';
+                                        } else {
+                                            badgeObj.style.display = 'none';
+                                        }
+                                    }
+
+                                    const lastMsgObj = document.getElementById(`last-msg-${fKey}`);
+                                    if (lastMsgObj) { 
+                                        lastMsgObj.innerText = lastMsgText; 
+                                    }
+                                });
+                                
+                                activeChatListeners[cid] = unsubBadge;
+                            }
+                        });
+                    }
+
+                    // =========================================
+                    // ADMIN PANEL NOTIFICATIONS
+                    // =========================================
+                    document.getElementById('admin-req-trigger').onclick = () => {
+                        if(auth.currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+                            return;
+                        }
+                        
+                        switchScreen('admin-panel');
+                        
+                        const adminInboxRef = ref(db, `admin_inbox`);
+                        
+                        // UNSUBSCRIBE PREVIOUS TO PREVENT DUPLICATION
+                        if (unsubAdmin) unsubAdmin();
+
+                        unsubAdmin = onValue(adminInboxRef, async (snap) => {
+                            const list = document.getElementById('admin-req-list');
+                            list.innerHTML = "";
+                            
+                            if(!snap.exists()) {
+                                list.innerHTML = `<p style="text-align:center; padding:50px; color:#8696a0;">No Active Support Requests</p>`;
+                                return;
+                            }
+                            
+                            for(let sender in snap.val()) {
+                                const data = snap.val()[sender];
+                                const pfpSnap = await get(ref(db, `users/${sender}/profilePic`));
+                                
+                                const item = document.createElement('div');
+                                item.className = "friend-item";
+                                item.innerHTML = `
+                                    <div class="avatar">
+                                        ${pfpSnap.val() ? `<img src="${pfpSnap.val()}">` : `<i class="fas fa-user-circle"></i>`}
+                                    </div>
+                                    <div class="user-info">
+                                        <b style="color:var(--gold-shine);">@${sender}</b>
+                                        <p style="color:#fff;">${data.last || "Sent a support request..."}</p>
+                                    </div>
+                                    <i class="fas fa-chevron-right" style="color:#444;"></i>
+                                `;
+                                
+                                item.onclick = () => openChat(sender);
+                                list.appendChild(item);
+                            }
+                        });
+                    };
+
+                    // =========================================
+                    // GLOBAL ACTION TRIGGERS FOR CHAT BUBBLES
+                    // =========================================
+                    window.openMsgActions = (key, content, type) => {
+                        window.activeMsgKey = key;
+                        window.activeMsgContent = content;
+                        window.activeMsgType = type;
+                        
+                        const editOpt = document.getElementById('opt-edit-msg');
+                        if (type === 'text') {
+                            editOpt.style.display = 'flex';
+                        } else {
+                            editOpt.style.display = 'none'; // Only allow edit for pure text
+                        }
+                        
+                        document.getElementById('msg-action-sheet').style.display = 'flex';
+                    };
+                    
+                    window.openViewOnceMedia = (key, url, type, caption) => {
+                        window.activeViewOnceKey = key;
+                        const viewer = document.getElementById('vo-viewer-screen');
+                        const vContent = document.getElementById('vo-viewer-content');
+                        const vCaption = document.getElementById('vo-viewer-caption');
+                        
+                        if(type === 'image') {
+                            vContent.innerHTML = `<img src="${url}" style="max-width:100%; max-height:100%; border-radius:10px; object-fit:contain;">`;
+                        } else if(type === 'video') {
+                            vContent.innerHTML = `<video src="${url}" controls autoplay style="max-width:100%; max-height:100%; border-radius:10px;"></video>`;
+                        }
+                        
+                        if(caption) {
+                            vCaption.innerText = caption;
+                            vCaption.style.display = 'block';
+                        } else {
+                            vCaption.style.display = 'none';
+                        }
+                        
+                        viewer.style.display = 'flex';
+                    };
+
+                    document.getElementById('opt-edit-msg').onclick = () => {
+                        document.getElementById('msg-action-sheet').style.display = 'none';
+                        if (window.activeMsgKey && window.activeMsgType === 'text') {
+                            const newText = prompt("Edit your message:", window.activeMsgContent);
+                            if (newText && newText !== window.activeMsgContent) {
+                                const encrypted = CryptoJS.AES.encrypt(newText, SECRET_KEY).toString();
+                                update(ref(db, `chats/${currentCID}/${window.activeMsgKey}`), { 
+                                    text: encrypted, 
+                                    isEdited: true 
+                                });
+                            }
+                        }
+                    };
+                    
+                    document.getElementById('opt-del-msg').onclick = async () => {
+                        document.getElementById('msg-action-sheet').style.display = 'none';
+                        if (window.activeMsgKey) {
+                            // Silent Delete: Removes from Firebase without alert
+                            await remove(ref(db, `chats/${currentCID}/${window.activeMsgKey}`));
+                        }
+                    };
+
+                    document.getElementById('close-vo-viewer').onclick = async () => {
+                        document.getElementById('vo-viewer-screen').style.display = 'none';
+                        document.getElementById('vo-viewer-content').innerHTML = '';
+                        if (window.activeViewOnceKey) {
+                            // AUTO DESTRUCT THE MESSAGE FROM DB
+                            await remove(ref(db, `chats/${currentCID}/${window.activeViewOnceKey}`));
+                            window.activeViewOnceKey = null;
+                        }
+                    };
+
+                    // Helper to bind LONG PRESS (HOLD) functionality
+                    function bindLongPress(element, key, content, type) {
+                        let pressTimer;
+                        const start = (e) => {
+                            if (pressTimer) clearTimeout(pressTimer);
+                            pressTimer = setTimeout(() => {
+                                window.openMsgActions(key, content, type);
+                            }, 600);
+                        };
+                        const cancel = () => {
+                            if (pressTimer) clearTimeout(pressTimer);
+                        };
+
+                        element.addEventListener('touchstart', start, {passive: true});
+                        element.addEventListener('touchend', cancel);
+                        element.addEventListener('touchmove', cancel);
+                        
+                        element.addEventListener('mousedown', start);
+                        element.addEventListener('mouseup', cancel);
+                        element.addEventListener('mouseleave', cancel);
+                    }
+
+                    // =========================================
+                    // CHAT SCREEN
+                    // =========================================
+                    async function openChat(friend, isVerified = false) {
+                        // KILL ALL PREVIOUS CHAT LISTENERS BEFORE ADDING NEW ONES
+                        if(unsubChatAdded) { unsubChatAdded(); unsubChatAdded = null; }
+                        if(unsubChatChanged) { unsubChatChanged(); unsubChatChanged = null; }
+                        if(unsubChatRemoved) { unsubChatRemoved(); unsubChatRemoved = null; }
+                        
+                        chatFriend = friend;
+                        currentCID = [currentUser, friend].sort().join("_");
+                        
+                        document.getElementById('chat-target-name').innerText = friend;
+                        document.getElementById('chat-blue-tick').style.display = isVerified ? "inline-block" : "none";
+                        
+                        const targetSnap = await get(ref(db, `users/${friend}/profilePic`));
+                        const targetAvatarObj = document.getElementById('chat-target-avatar');
+                        
+                        targetAvatarObj.innerHTML = targetSnap.val() ? `<img src="${targetSnap.val()}">` : `<i class="fas fa-user"></i>`;
+                        
+                        switchScreen('chat-screen');
+                        const body = document.getElementById('chat-body');
+                        body.innerHTML = "";
+
+                        if(friend === ADMIN_USER || currentUser === ADMIN_USER) {
+                            body.classList.add('golden-theme');
+                            body.classList.remove('vip-theme');
+                            targetAvatarObj.classList.remove('vip-ring');
+                        } else if (isVerified) {
+                            body.classList.add('vip-theme');
+                            body.classList.remove('golden-theme');
+                            targetAvatarObj.classList.add('vip-ring');
+                        } else {
+                            body.classList.remove('golden-theme', 'vip-theme');
+                            targetAvatarObj.classList.remove('vip-ring');
+                        }
+
+                        const chatRef = ref(db, `chats/${currentCID}`);
+
+                        // NEW: ASSIGN UNSUBSCRIBE FUNCTIONS DIRECTLY
+                        unsubChatRemoved = onChildRemoved(chatRef, (snap) => {
+                            const domElement = document.getElementById(`msg-bubble-${snap.key}`);
+                            if (domElement) {
+                                domElement.remove();
+                            }
+                        });
+
+                        unsubChatAdded = onChildAdded(chatRef, (snap) => {
+                            const msg = snap.val();
+                            const isMyMsg = msg.sender === currentUser;
+                            
+                            if(!isMyMsg && msg.status !== 'read') {
+                                update(ref(db, `chats/${currentCID}/${snap.key}`), { status: 'read' });
+                            }
+
+                            const div = document.createElement('div');
+                            // Add an ID so we can silently remove/edit it
+                            div.id = `msg-bubble-${snap.key}`;
+                            div.className = `bubble ${isMyMsg ? 'sent' : 'received'}`;
+                            
+                            let content = msg.text;
+                            try {
+                                let bytes = CryptoJS.AES.decrypt(msg.text, SECRET_KEY);
+                                content = bytes.toString(CryptoJS.enc.Utf8);
+                            } catch(e) { 
+                                content = msg.text; 
+                            }
+                            
+                            let captionDecrypted = "";
+                            if (msg.caption) {
+                                try {
+                                    let capBytes = CryptoJS.AES.decrypt(msg.caption, SECRET_KEY);
+                                    captionDecrypted = capBytes.toString(CryptoJS.enc.Utf8);
+                                } catch(e) {}
+                            }
+
+                            const badge = (msg.sender === ADMIN_USER) ? `<span class="dev-badge">DEVELOPER</span><br>` : "";
+                            const editedTag = msg.isEdited ? `<span class="edited-tag">(edited)</span>` : "";
+                            
+                            // RENDER VIEW ONCE LOGIC
+                            if (msg.isViewOnce) {
+                                if (isMyMsg) {
+                                    // I sent it: Just show a bomb icon to indicate it's a View Once message.
+                                    div.innerHTML = `
+                                        ${badge}
+                                        <i class="fas fa-bomb" style="color:var(--view-once-color);"></i> [View Once Sent]
+                                        <span class="status-tick ${msg.status==='read'?'read':''}" id="tick-${snap.key}">
+                                            <i class="fas fa-check-double"></i>
+                                        </span>
+                                    `;
+                                    // Bind Long Press for Unsend
+                                    bindLongPress(div, snap.key, content, msg.type);
+                                } else {
+                                    // Receiver sees a locked bubble
+                                    div.className = "locked-vo-bubble";
+                                    div.innerHTML = `
+                                        <i class="fas fa-lock" style="font-size:24px;"></i>
+                                        <div><b>Secret ${msg.type.toUpperCase()}</b><br><small>Tap to view & destroy</small></div>
+                                    `;
+                                    // Touch/Click to open view once media
+                                    div.onclick = () => window.openViewOnceMedia(snap.key, content, msg.type, captionDecrypted);
+                                }
+                            } else {
+                                // STANDARD RENDER LOGIC
+                                let mediaHTML = `<span>${content}</span>`;
+                                if(msg.type === 'image') {
+                                    mediaHTML = `<img src="${content}" style="width:100%; border-radius:8px; margin-top:5px;">`;
+                                } else if(msg.type === 'video') {
+                                    mediaHTML = `<video controls src="${content}" style="width:100%; border-radius:8px; margin-top:5px;"></video>`;
+                                } else if(msg.type === 'audio') {
+                                    mediaHTML = `
+                                        <div style="display:flex; align-items:center; gap:10px; padding:5px 0;">
+                                            <i class="fas fa-headphones-alt" style="font-size:24px; color:var(--wa-action);"></i>
+                                            <audio controls src="${content}" style="height:40px; width:200px; border-radius:20px; outline:none;"></audio>
+                                        </div>
+                                    `;
+                                } else if(msg.type === 'file') {
+                                    /* UPDATE: Added rel="noopener noreferrer" for Security */
+                                    mediaHTML = `
+                                        <a href="${content}" target="_blank" rel="noopener noreferrer" class="file-attachment">
+                                            <i class="fas fa-file-alt"></i>
+                                            <div style="overflow:hidden;">
+                                                <div style="font-weight:bold; font-size:14px;">Document</div>
+                                            </div>
+                                        </a>
+                                    `;
+                                }
+                                
+                                let captionHTML = captionDecrypted ? `<span class="caption-text">${captionDecrypted}</span>` : "";
+                                
+                                div.innerHTML = `
+                                    ${badge}
+                                    ${mediaHTML}
+                                    ${captionHTML}
+                                    ${editedTag}
+                                    <span class="status-tick ${msg.status==='read'?'read':''}" id="tick-${snap.key}">
+                                        ${isMyMsg ? '<i class="fas fa-check-double"></i>' : ''}
+                                    </span>
+                                `;
+                                
+                                // Only my messages get the Long Press to Edit/Unsend
+                                if (isMyMsg) {
+                                    bindLongPress(div, snap.key, content, msg.type);
+                                }
+                            }
+                            
+                            body.appendChild(div);
+                            body.scrollTop = body.scrollHeight;
+                        });
+
+                        // Handle Edit UI update without refresh
+                        unsubChatChanged = onChildChanged(chatRef, (snap) => {
+                            const updatedMsg = snap.val();
+                            const domElement = document.getElementById(`msg-bubble-${snap.key}`);
+                            
+                            if (domElement) {
+                                // Update Read Ticks
+                                if (updatedMsg.sender === currentUser && updatedMsg.status === 'read') {
+                                    const tickElement = document.getElementById(`tick-${snap.key}`);
+                                    if (tickElement) {
+                                        tickElement.classList.add('read');
+                                    }
+                                }
+                                // Update Edited Text content dynamically without refreshing
+                                if (updatedMsg.isEdited && updatedMsg.type === 'text') {
+                                    try {
+                                        let bytes = CryptoJS.AES.decrypt(updatedMsg.text, SECRET_KEY);
+                                        let newText = bytes.toString(CryptoJS.enc.Utf8);
+                                        
+                                        const isMyMsg = updatedMsg.sender === currentUser;
+                                        const badge = (updatedMsg.sender === ADMIN_USER) ? `<span class="dev-badge">DEVELOPER</span><br>` : "";
+                                        
+                                        domElement.innerHTML = `
+                                            ${badge}
+                                            <span>${newText}</span>
+                                            <span class="edited-tag">(edited)</span>
+                                            <span class="status-tick ${updatedMsg.status==='read'?'read':''}" id="tick-${snap.key}">
+                                                ${isMyMsg ? '<i class="fas fa-check-double"></i>' : ''}
+                                            </span>
+                                        `;
+                                    } catch(e) {}
+                                }
+                            }
+                        });
+                    }
+
+                    // =========================================
+                    // MEDIA PREVIEW & UPLOAD LOGIC
+                    // =========================================
+                    document.getElementById('vo-toggle-btn').onclick = (e) => {
+                        isViewOnceActive = !isViewOnceActive;
+                        if(isViewOnceActive) {
+                            e.target.classList.add('active');
+                        } else {
+                            e.target.classList.remove('active');
+                        }
+                    };
+
+                    document.getElementById('close-preview-btn').onclick = () => {
+                        document.getElementById('media-preview-screen').style.display = 'none';
+                        pendingMediaFile = null;
+                        document.getElementById('file-input').value = ""; // reset
+                    };
+
+                    document.getElementById('file-input').onchange = (e) => {
+                        const file = e.target.files[0];
+                        if(!file) return;
+                        
+                        pendingMediaFile = file;
+                        isViewOnceActive = false; // default off
+                        document.getElementById('vo-toggle-btn').classList.remove('active');
+                        document.getElementById('media-caption-input').value = "";
+                        
+                        const pContainer = document.getElementById('preview-content-box');
+                        pContainer.innerHTML = "";
+                        
+                        if (file.type.startsWith('image/')) {
+                            const imgUrl = URL.createObjectURL(file);
+                            pContainer.innerHTML = `<img src="${imgUrl}">`;
+                            document.getElementById('vo-toggle-btn').style.display = 'flex'; // allow view once
+                        } else if (file.type.startsWith('video/')) {
+                            const vidUrl = URL.createObjectURL(file);
+                            pContainer.innerHTML = `<video src="${vidUrl}" controls></video>`;
+                            document.getElementById('vo-toggle-btn').style.display = 'flex'; // allow view once
+                        } else {
+                            pContainer.innerHTML = `<i class="fas fa-file-alt" style="font-size:100px; color:var(--wa-action);"></i><br><p style="color:white; margin-top:20px;">${file.name}</p>`;
+                            document.getElementById('vo-toggle-btn').style.display = 'none'; // no view once for pure files
+                        }
+                        
+                        document.getElementById('media-preview-screen').style.display = 'flex';
+                    };
+
+                    document.getElementById('send-media-btn').onclick = async () => {
+                        if (!pendingMediaFile) return;
+                        const file = pendingMediaFile;
+                        const caption = document.getElementById('media-caption-input').value.trim();
+                        const viewOnceStatus = isViewOnceActive;
+                        
+                        // FIX: Clear immediately to prevent multiple clicks uploading 5 times
+                        pendingMediaFile = null;
+                        document.getElementById('file-input').value = ""; 
+                        
+                        const btn = document.getElementById('send-media-btn');
+                        const oldHTML = btn.innerHTML;
+                        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+                        
+                        try {
+                            if (file.type.startsWith('image/')) {
+                                // IMGBB UPLOAD FOR IMAGES
+                                const fd = new FormData();
+                                fd.append("image", file);
+                                
+                                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { 
+                                    method: "POST", body: fd 
+                                });
+                                const data = await res.json();
+                                
+                                if(data.success) {
+                                    await sendMessageToFirebase(data.data.url, 'image', caption, viewOnceStatus);
+                                } else {
+                                    alert("Image upload failed! Please try again.");
+                                }
+                            } else {
+                                // CLOUDINARY UPLOAD FOR VIDEO & FILES
+                                const timestamp = Math.round((new Date).getTime() / 1000);
+                                const signatureString = `timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
+                                const signature = CryptoJS.SHA1(signatureString).toString(CryptoJS.enc.Hex);
+
+                                const fd = new FormData();
+                                fd.append("file", file);
+                                fd.append("api_key", CLOUDINARY_API_KEY);
+                                fd.append("timestamp", timestamp);
+                                fd.append("signature", signature);
+                                
+                                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, { 
+                                    method: "POST", body: fd 
+                                });
+                                const data = await res.json();
+                                
+                                if(data.secure_url) {
+                                    let messageType = file.type.startsWith('video/') ? 'video' : 'file';
+                                    await sendMessageToFirebase(data.secure_url, messageType, caption, viewOnceStatus);
+                                } else {
+                                    alert("Upload failed! Server response: " + (data.error ? data.error.message : "Unknown error"));
+                                }
+                            }
+                        } catch (error) {
+                            alert("Network error during upload.");
+                        }
+                        
+                        // Cleanup after send
+                        btn.innerHTML = oldHTML;
+                        document.getElementById('media-preview-screen').style.display = 'none';
+                    };
+
+                    async function sendMessageToFirebase(fileUrl, messageType, captionText = "", isViewOnce = false) {
+                        const encryptedUrl = CryptoJS.AES.encrypt(fileUrl, SECRET_KEY).toString();
+                        let msgData = { 
+                            sender: currentUser, 
+                            text: encryptedUrl, 
+                            type: messageType, 
+                            isViewOnce: isViewOnce,
+                            status: 'sent', 
+                            timestamp: serverTimestamp() 
+                        };
+
+                        if (captionText) {
+                            msgData.caption = CryptoJS.AES.encrypt(captionText, SECRET_KEY).toString();
+                        }
+
+                        await push(ref(db, `chats/${currentCID}`), msgData);
+                        
+                        if(chatFriend === ADMIN_USER) {
+                            await update(ref(db, `admin_inbox/${currentUser}`), { 
+                                last: `Sent a ${messageType}`, 
+                                timestamp: serverTimestamp() 
+                            });
+                            notifyTelegram(`User sent a ${messageType}: ` + fileUrl);
+                        }
+
+                        try {
+                            let targetUID = chatFriend;
+                            try {
+                                const friendSnap = await get(ref(db, `users/${chatFriend}`));
+                                if(friendSnap.exists() && friendSnap.val().uid) { 
+                                    targetUID = friendSnap.val().uid; 
+                                }
+                            } catch(fetchErr) {}
+                            
+                        } catch (e) {
+                            console.error("Firebase send operation finalized.");
+                        }
+                    }
+
+                    // =========================================
+                    // TEXT AND VOICE NOTE SENDING LOGIC
+                    // =========================================
+                    const sendBtn = document.getElementById('send-btn');
+                    const msgInput = document.getElementById('msg-input');
+                    const sendIcon = document.getElementById('send-icon');
+                    const recordingUI = document.getElementById('recording-ui');
+                    const recordTimer = document.getElementById('record-timer');
+
+                    msgInput.addEventListener('input', () => {
+                        if(msgInput.value.trim() !== "") {
+                            sendIcon.className = "fas fa-paper-plane action-icon";
+                        } else {
+                            sendIcon.className = "fas fa-microphone action-icon";
+                        }
+                    });
+
+                    // TEXT SEND
+                    sendBtn.onclick = async () => {
+                        if (isRecording) {
+                            stopRecordingUI(false); 
+                            return;
+                        }
+
+                        const text = msgInput.value.trim();
+                        if (!text) return;
+                        msgInput.value = "";
+                        sendIcon.className = "fas fa-microphone action-icon";
+                        
+                        const encrypted = CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
+                        await push(ref(db, `chats/${currentCID}`), {
+                            sender: currentUser,
+                            text: encrypted,
+                            type: 'text',
+                            status: 'sent',
+                            timestamp: serverTimestamp(),
+                            isViewOnce: false
+                        });
+
+                        if(chatFriend === ADMIN_USER) {
+                            await update(ref(db, `admin_inbox/${currentUser}`), { last: text, timestamp: serverTimestamp() });
+                            notifyTelegram(text);
+                        }
+                    };
+
+                    // HOLD TO RECORD LOGIC (Mobile Friendly)
+                    let startY = 0;
+                    sendBtn.addEventListener('touchstart', async (e) => {
+                        if (msgInput.value.trim() !== "") return; 
+                        
+                        e.preventDefault();
+                        startX = e.touches[0].clientX;
+                        startY = e.touches[0].clientY;
+                        
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            mediaRecorder = new MediaRecorder(stream);
+                            audioChunks = [];
+                            
+                            mediaRecorder.ondataavailable = event => {
+                                if (event.data.size > 0) audioChunks.push(event.data);
+                            };
+                            
+                            mediaRecorder.onstop = async () => {
+                                stream.getTracks().forEach(track => track.stop());
+                                if (isCancelled) return;
+                                
+                                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                                
+                                const timestamp = Math.round((new Date).getTime() / 1000);
+                                const signatureString = `timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
+                                const signature = CryptoJS.SHA1(signatureString).toString(CryptoJS.enc.Hex);
+
+                                const fd = new FormData();
+                                fd.append("file", audioBlob);
+                                fd.append("api_key", CLOUDINARY_API_KEY);
+                                fd.append("timestamp", timestamp);
+                                fd.append("signature", signature);
+                                
+                                try {
+                                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`, { method: "POST", body: fd });
+                                    const data = await res.json();
+                                    if(data.secure_url) {
+                                        await sendMessageToFirebase(data.secure_url, 'audio', '', false);
+                                    }
+                                } catch(err) { console.error(err); }
+                            };
+                            
+                            mediaRecorder.start();
+                            isRecording = true;
+                            isCancelled = false;
+                            
+                            msgInput.style.display = 'none';
+                            recordingUI.style.display = 'flex';
+                            
+                            recordSeconds = 0;
+                            recordTimer.innerText = "00:00";
+                            recordTimerInterval = setInterval(() => {
+                                recordSeconds++;
+                                const m = String(Math.floor(recordSeconds / 60)).padStart(2, '0');
+                                const s = String(recordSeconds % 60).padStart(2, '0');
+                                recordTimer.innerText = `${m}:${s}`;
+                            }, 1000);
+                            
+                        } catch(err) {
+                            alert("Microphone permission denied! Please allow access in settings.");
+                        }
+                    }, {passive: false});
+
+                    sendBtn.addEventListener('touchmove', (e) => {
+                        if(!isRecording) return;
+                        const currentX = e.touches[0].clientX;
+                        if(startX - currentX > 50) { 
+                            isCancelled = true;
+                            stopRecordingUI(true);
+                        }
+                    }, {passive: false});
+
+                    sendBtn.addEventListener('touchend', (e) => {
+                        if(msgInput.value.trim() !== "") return; 
+                        if(isRecording) stopRecordingUI(false);
+                    });
+
+                    function stopRecordingUI(cancelStatus) {
+                        isCancelled = cancelStatus;
+                        if(mediaRecorder && mediaRecorder.state !== "inactive") {
+                            mediaRecorder.stop();
+                        }
+                        isRecording = false;
+                        clearInterval(recordTimerInterval);
+                        recordingUI.style.display = 'none';
+                        msgInput.style.display = 'block';
+                    }
+
+                    // =========================================
+                    // GENERAL UI AND BUTTON HANDLERS
+                    // =========================================
+                    document.getElementById('back-btn').onclick = showMain;
+                    
+                    document.getElementById('logout-btn').onclick = () => {
+                        signOut(auth).then(() => {
+                            window.location.reload();
+                        });
+                    };
+                    
+                    document.getElementById('app-details-btn').onclick = () => {
+                        document.getElementById('dropdown-menu').style.display = 'none';
+                        switchScreen('app-details-screen');
+                    };
+                    
+                    document.getElementById('save-user-btn').onclick = async () => {
+                        const uname = document.getElementById('setup-username').value.trim().toLowerCase();
+                        if(uname.length < 3) return alert("Username is too short! Minimum 3 characters required.");
+                        
+                        const check = await get(ref(db, `users/${uname}`));
+                        if(check.exists()) return alert("Username already taken! Please choose another one.");
+                        
+                        let finalPfp = tempPfpUrl;
+                        const pfpFile = document.getElementById('pfp-input-setup').files[0];
+                        if(pfpFile) {
+                            const btn = document.getElementById('save-user-btn');
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPLOADING...';
+                            const fd = new FormData();
+                            fd.append("image", pfpFile);
+                            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+                            const data = await res.json();
+                            if(data.success) finalPfp = data.data.url;
+                            btn.innerHTML = 'NEXT STEP <i class="fas fa-arrow-right"></i>';
+                        }
+                        
+                        await set(ref(db, `users/${uname}`), {
+                            uid: currentUID,
+                            profilePic: finalPfp,
+                            joined: serverTimestamp()
+                        });
+                        
+                        await set(ref(db, `userMapping/${currentUID}`), uname);
+                        
+                        currentUser = uname;
+                        switchScreen('referral-screen');
+                    };
+
+                    document.getElementById('skip-ref-btn').onclick = showMain;
+                    
+                    document.getElementById('apply-ref-btn').onclick = async () => {
+                        const code = document.getElementById('ref-code-input').value.trim();
+                        if (!code) return;
+                        alert("Referral logic processed successfully.");
+                        showMain();
+                    };
+
+                    document.getElementById('add-friend-btn').onclick = () => {
+                        const target = prompt("Enter the exact Username to add friend:");
+                        if(!target || target.toLowerCase() === currentUser.toLowerCase()) return;
+                        
+                        get(ref(db, `users/${target.toLowerCase()}`)).then(snap => {
+                            if(snap.exists()) {
+                                set(ref(db, `friend_requests/${target.toLowerCase()}/${currentUser}`), true)
+                                .then(() => alert("Friend Request Sent Successfully!"));
+                            } else {
+                                alert("User not found! Please check the username and try again.");
+                            }
+                        });
+                    };
+
+                    document.getElementById('menu-btn-trigger').onclick = (e) => {
+                        const menu = document.getElementById('dropdown-menu');
+                        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                        e.stopPropagation();
+                    };
+
+                    document.addEventListener('click', () => {
+                        const menu = document.getElementById('dropdown-menu');
+                        if (menu && menu.style.display === 'block') {
+                            menu.style.display = 'none';
+                        }
+                    });
+
+                    // Talk to Developer Button Logic
+                    document.getElementById('talk-dev-btn').onclick = () => {
+                        document.getElementById('dropdown-menu').style.display = 'none';
+                        openChat(ADMIN_USER);
+                    };
+
+                    // Profile Pic Setup Preview
+                    document.getElementById('pfp-input-setup').onchange = (e) => {
+                        if(e.target.files && e.target.files[0]) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                document.getElementById('pfp-preview').src = e.target.result;
+                                document.getElementById('pfp-preview').style.display = 'block';
+                                document.getElementById('pfp-icon').style.display = 'none';
+                            }
+                            reader.readAsDataURL(e.target.files[0]);
+                        }
+                    };
+
+                });
+            });
+        });
+    </script>
+</body>
+</html>
